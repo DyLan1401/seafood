@@ -14,16 +14,16 @@ export default function Home() {
     const { data: category, isLoading: loadingCategories, error: errorCategories } = useQuery<Category[]>({
         queryKey: ["categories", 5],
         queryFn: async () => {
-            const res = await api.get("/categories?page=1&limit=4");
-            return res.data;
+            const res = await api.get("/category/all?page=1&limit=4");
+            return res.data.items;
         },
     });
 
     const { data: product, isLoading: loadingProduct, error: errorProduct } = useQuery<Product[]>({
         queryKey: ["products", 5],
         queryFn: async () => {
-            const res = await api.get("/products?page=1&limit=4");
-            return res.data;
+            const res = await api.get("/product/all?page=1&limit=4");
+            return res.data.items;
         },
     });
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import api from "../api/axios"
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
     const { items, clearCart } = useCartStore();
@@ -21,7 +21,7 @@ export default function Checkout() {
         try {
             setLoading(true);
 
-            const res = await api.post("/orders", {
+            const res = await api.post("/order/create", {
                 customerName,
                 phone,
                 address,

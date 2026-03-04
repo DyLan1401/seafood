@@ -12,7 +12,7 @@ export default function ProductDetail() {
         queryKey: ["product", slug],
         enabled: !!slug,
         queryFn: async () => {
-            const res = await api.get(`/products/${slug}`);
+            const res = await api.get(`/product/${slug}`);
             return res.data;
         }
     })

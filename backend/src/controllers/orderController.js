@@ -1,0 +1,76 @@
+import * as orderService from '../services/orderService.js';
+
+//lấy đơn hàng
+export const getAllOrders = async (req, res) => {
+    try {
+        //
+        const data = await orderService.getOrders();
+        //check 
+        if (!data) {
+            return res.status(404).json({ message: "Không tìm thấy đơn hàng!!!" });
+        }
+        //
+        res.status(200).json(data);
+        //
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi khi lấy dữ liệu" });
+    }
+};
+
+//thêm đơn hàng mới
+export const createOrder = async (req, res) => {
+    try {
+        const { customerName, phone, address, note, items } = req.body;
+        //
+        const userId = req.admin.id;
+        // Kiểm tra thông tin khách hàng ở đây 
+        if (!customerName || !phone || !address) {
+            return res.status(400).json({ message: "Thiếu thông tin giao hàng" });
+        }
+        //
+        const newOrder = await orderService.addOrder({ userId, customerName, phone, address, note, items });
+        //
+        res.status(201).json(newOrder);
+        //
+    } catch (error) {
+        console.error("Order Error:", error);
+        res.status(400).json({ message: error.message || "Lỗi khi tạo đơn hàng" });
+    }
+};
+
+//lấy chi tiết đơn hàng
+export const getOrderDetail = async (req, res) => {
+    try {
+        const { id } = req.params;
+        //
+        const data = await orderService.getOrderDetail({ id });
+        //// Kiểm tra nếu không có dữ liệu trả về
+        if (!data) {
+            return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+        };
+        //
+        res.status(200).json(data);
+        //
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi khi lấy dữ liệu" });
+    }
+};
+
+//cập nhật đơn hàng
+export const updateOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        //
+        const data = await orderService.updateOrder({ id, status });
+        //Kiểm tra nếu không có dữ liệu trả về
+        if (!data) {
+            return res.status(404).json({ message: "Không tìm thấy đơn hàng để cập nhật" });
+        }
+        //
+        res.status(200).json(data);
+        //
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi khi lấy dữ liệu" });
+    }
+};

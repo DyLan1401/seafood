@@ -11,7 +11,7 @@ export default function Products() {
     const { data: product, isLoading, error } = useQuery<Product[]>({
         queryKey: ["products"],
         queryFn: async () => {
-            const res = await api.get("/products");
+            const res = await api.get("/product/all");
             return res.data;
         },
     });
