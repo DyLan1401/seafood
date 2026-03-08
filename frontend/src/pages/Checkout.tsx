@@ -3,7 +3,10 @@ import { useCartStore } from "../store/cartStore";
 import api from "../api/axios"
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
-
+import { useToast } from "../hooks/useToast";
+import { ToastContainer } from "../component/ToastContainer";
+import Header from "../component/Header";
+import Footer from "../component/Footer";
 export default function Checkout() {
     const { items, clearCart } = useCartStore();
     const navigate = useNavigate();
@@ -13,6 +16,7 @@ export default function Checkout() {
     const [address, setAddress] = useState("");
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(false);
+    const { toasts, show } = useToast();
 
     const handleSubmit = async () => {
         if (!isAuth) {
@@ -40,10 +44,10 @@ export default function Checkout() {
             });
 
             clearCart();
-            alert("Đặt hàng thành công. Mã đơn: " + res.data.id);
+            show("Đặt hàng thành công. Mã đơn: " + res.data.id, "success");
             navigate("/");
         } catch (err: unknown) {
-            alert(err.response?.data?.error || "Lỗi hệ thống");
+            show(err.response?.data?.error || "Lỗi hệ thống", "error");
         } finally {
             setLoading(false);
         }
@@ -51,6 +55,8 @@ export default function Checkout() {
 
     return (
         <div className="bg-gray-50 min-h-screen">
+            <ToastContainer toasts={toasts} />
+            <Header />
             <div className="container mx-auto p-4 md:py-10">
                 <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 border-b pb-4">Thanh toán</h1>
 
@@ -147,6 +153,7 @@ export default function Checkout() {
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 }

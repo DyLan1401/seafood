@@ -3,12 +3,14 @@ import api from "../api/axios"
 import { useNavigate } from "react-router-dom";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
-
+import { useToast } from "../hooks/useToast";
+import { ToastContainer } from "../component/ToastContainer";
 export default function Register() {
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { toasts, show } = useToast();
 
     const handleSubmit = async () => {
         // Logic kiểm tra đầu vào giữ nguyên
@@ -24,23 +26,24 @@ export default function Register() {
                 password
             });
 
-            alert("Tạo tài khoản thành công!");
+            show("Tạo tài khoản thành công!", "success");
             navigate("/login");
         } catch (err: any) {
-            const errorMessage = err.response?.data?.message || "Lỗi đăng ký!";
-            alert(errorMessage);
+            show("Lỗi đăng ký!", "error");
         }
     };
 
     return (
 
         <div>
+            <ToastContainer toasts={toasts} />
+
             <Header />
             <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
                 <div className="w-full max-w-md bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-gray-100">
 
                     <div className="text-center mb-8">
-                        <h1 className="text-2xl md:text-3xl font-bold text-[#BF4E2C]">Register</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-[#BF4E2C]">Đăng kí</h1>
                         <p className="text-gray-500 text-sm mt-2">Tạo tài khoản để trải nghiệm chi tiết hơn</p>
                     </div>
 

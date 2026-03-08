@@ -4,13 +4,15 @@ import { useAuthStore } from "../store/authStore"; // Import store
 import { useNavigate } from "react-router-dom";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
+import { useToast } from "../hooks/useToast";
+import { ToastContainer } from "../component/ToastContainer";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    const { toasts, show } = useToast();
 
-    // Lấy hàm setLogin từ Zustand
     const setLogin = useAuthStore((state) => state.setLogin);
 
     const handleLogin = async () => {
@@ -19,23 +21,23 @@ export default function Login() {
 
             // Lưu Token và thông tin Admin vào Zustand
             setLogin(res.data.token, res.data.user);
-
-            alert("Đăng nhập thành công!");
+            show("Đăng nhập thành công!", "success");
             navigate("/");
         } catch (err: unknown) {
-            alert(err.response?.data?.error || "Sai tài khoản hoặc mật khẩu");
+            show("Sai tài khoản hoặc mật khẩu", "error");
         }
     };
 
     return (
 
         <div>
+            <ToastContainer toasts={toasts} />
             <Header />
             <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
                 <div className="w-full max-w-md bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
 
                     <div className="flex flex-col items-center mb-8">
-                        <h1 className="text-2xl md:text-3xl font-bold text-[#BF4E2C]">Login</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-[#BF4E2C]">Đăng nhập</h1>
                         <p className="text-gray-500 text-sm mt-2">Đăng nhập để trải nghiệm chi tiết hơn !!!</p>
                     </div>
 
@@ -64,6 +66,7 @@ export default function Login() {
                         <button
                             onClick={handleLogin}
                             className="w-full bg-[#2C8DE0] hover:bg-[#1a6fb8] text-white font-bold py-3 rounded-xl shadow-lg transform transition active:scale-95 mt-2"
+
                         >
                             Đăng Nhập
                         </button>

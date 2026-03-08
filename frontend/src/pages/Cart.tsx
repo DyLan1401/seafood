@@ -82,12 +82,12 @@ export default function Cart() {
                         <Link to="/checkout"
                             className="w-full ">
                             <button
-                                className="bg-[#2C8DE0] hover:text-[#2C8DE0] ease-in-out duration-500    border-2  hover:bg-white  rounded-lg text-white w-full py-4">Tiếp tục mua hàng</button>
+                                className="bg-[#2C8DE0] hover:text-[#2C8DE0] ease-in-out duration-500    border-2  hover:bg-white  rounded-lg text-white w-full py-4">Tiếp tục thanh toán</button>
                         </Link>
                         <Link to="/"
                             className="w-full ">
                             <button
-                                className="bg-[#2C8DE0] hover:text-[#2C8DE0] ease-in-out duration-500    border-2  hover:bg-white  rounded-lg text-white w-full py-4">Tiếp tục mua hàng</button>
+                                className="bg-[#2C8DE0] hover:text-[#2C8DE0] ease-in-out duration-500    border-2  hover:bg-white  rounded-lg text-white w-full py-4">trở lại mua hàng</button>
                         </Link>
                     </div>
 
