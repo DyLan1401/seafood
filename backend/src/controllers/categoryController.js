@@ -33,3 +33,70 @@ export const getCategoryDetail = async (req, res) => {
         res.status(500).json({ error: error });
     }
 }
+
+export const AddCategory = async (req, res) => {
+    try {
+        const { name, slug, image_url } = req.body;
+
+        const data = await categoryService.createCategory({ name, slug, image_url });
+
+        if (!data.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Không thể thêm danh mục",
+            });
+        }
+        res.status(201).json({
+            message: "Đã tạo thành công danh mục",
+            id: data.insertId
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
+    }
+};
+
+//
+export const UpdateCategory = async (req, res) => {
+    try {
+        const id = req.params;
+        const { name, slug, image_url } = req.body;
+
+        const data = await categoryService.UpdateCategory({ id, name, slug, image_url });
+
+        if (!data) {
+            res.status(404).json("không thể cập nhật danh mục");
+        };
+
+        res.status(200).json("Đã cập nhập thành công danh mục")
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
+    }
+}
+
+
+export const DeleteCategory = async (req, res) => {
+    try {
+        const id = req.params;
+
+        const data = await categoryService.DeleteCategory({ id });
+
+        if (!data) {
+            res.status(404).json("không thể xóa danh mục");
+        };
+
+        res.status(200).json("Đã xóa thành công danh mục")
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
+    }
+}

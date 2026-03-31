@@ -39,3 +39,28 @@ export const getCategoryDetail = async ({ slug }) => {
   );
   return rows[0];
 };
+
+export const createCategory = async ({ name, slug, image_url }) => {
+  const [rows] = await pool.query(
+    `INSERT INTO categories (name,slug,image_url,created_at)  VALUES (?,?,?,NOW()) `
+    , [name, slug, image_url]
+  )
+  return rows;
+}
+
+export const UpdateCategory = async ({ id, name, slug, image_url }) => {
+  const [rows] = await pool.query(
+    `UPDATE categories SET name = ?, slug = ?, image_url = ?, created_at = now() WHERE id = ? `
+    , [name, slug, image_url, id]
+  );
+  return rows;
+}
+
+export const DeleteCategory = async ({ id }) => {
+  const [rows] = await pool.query(
+    `DELETE FROM category WHERE id = ?`,
+    [id]
+  );
+  return rows;
+
+}
