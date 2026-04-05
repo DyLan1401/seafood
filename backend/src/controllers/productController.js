@@ -29,7 +29,7 @@ export const getProductDetail = async (req, res) => {
         const data = await productService.getProductDetail({ id });
         // Kiểm tra nếu không có dữ liệu trả về
         if (!data) {
-            return res.status(404).json({ message: "Không tìm thấy sản phẩm id:" + { id } });
+            return res.status(404).json({ message: `Không tìm thấy sản phẩm id: ${id}` });
         }
         //
         res.status(200).json(data);

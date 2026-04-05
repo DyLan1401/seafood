@@ -1,5 +1,45 @@
 import pool from "../utils/db.js";
 
+
+export const userList = async () => {
+    const [rows] = await pool.query(
+        `SELECT *  from users ORDER BY id DESC`
+    )
+    return rows;
+}
+
+export const userDetail = async ({ id }) => {
+
+    const [rows] = await pool.query(
+        `SELECT *  from users where id = ?`
+        , [id]
+    )
+    return rows[0];
+}
+
+export const deleteUser = async ({ id }) => {
+    const [rows] = await pool.query(
+        `DELETE from users where id = ?`
+        , [id]
+    );
+    return rows;
+}
+
+export const updateUser = async ({ id, email, password, role }) => {
+    const [rows] = await pool.query(
+        `UPDATE user SET 
+        email = ?,
+        password = ?,
+        role = ?,
+        created_at = NOW()
+        where id = ?
+        `
+        , [id, email, password, role]
+    );
+    return rows;
+}
+
+
 //tìm email trong bẳng users
 export const findUserByEmail = async (email) => {
     const [rows] = await pool.query(

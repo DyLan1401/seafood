@@ -1,36 +1,34 @@
-import { useState } from "react";
-import api from "../api/axios"
 import { useNavigate } from "react-router-dom";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
 import { useToast } from "../hooks/useToast";
 import { ToastContainer } from "../component/ToastContainer";
+import { useForm } from "react-hook-form";
+import { userInput } from "../lib/validitions";
+import { useUsers } from "../hooks/useUsers";
+
 export default function Register() {
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+
     const { toasts, show } = useToast();
+    const { register, handleSubmit, formState: { errors } } = useForm(userInput);
+    const { Register, isRegistering } = useUsers();
 
-    const handleSubmit = async () => {
-        // Logic kiểm tra đầu vào giữ nguyên
-        if (!email || !password) {
-            show("Vui lòng nhập đầy đủ Email và Mật khẩu!", "error");
-            return;
-        }
+    const handleRegister = (data: any) => {
+        Register(data, {
+            onSuccess: () => {
+                show("Đăng kí thành công!", "success");
+                navigate("/login")
 
-        try {
-            // Logic gửi API giữ nguyên
-            const res = await api.post("/user/register", {
-                email,
-                password
-            });
+            },
+            onError: (error: any) => {
+                // Xử lý lỗi riêng cho UI nếu cần
+                const errorMsg = error?.response?.data?.message || "Sai email hoặc mật khẩu";
+                show(errorMsg, "error");
+            }
+        });
 
-            show("Tạo tài khoản thành công!", "success");
-            navigate("/login");
-        } catch (err: any) {
-            show("Lỗi đăng ký!", "error");
-        }
     };
 
     return (
@@ -53,9 +51,11 @@ export default function Register() {
                             <input
                                 type="email"
                                 placeholder="example@gmail.com"
-                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#2C8DE0] focus:border-transparent transition-all"
+                                {...register("email", { required: "Vui lòng điền email" })}
                             />
+                            {errors.email && <span className="error text-red-500">{errors.email.message as string}</span>}
+
                         </div>
 
                         <div>
@@ -63,23 +63,24 @@ export default function Register() {
                             <input
                                 type="password"
                                 placeholder="Tối thiểu 6 ký tự"
-                                onChange={(e) => setPassword(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                                 className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#2C8DE0] focus:border-transparent transition-all"
+                                {...register("password", { required: "Vui lòng điền mật khẩu" })}
                             />
+                            {errors.password && <span className="error text-red-500">{errors.password.message as string}</span>}
+
                         </div>
 
                         <button
-                            onClick={handleSubmit}
+                            onClick={handleSubmit(handleRegister)}
                             className="w-full bg-[#2C8DE0] hover:bg-[#1a6fb8] text-white font-bold py-3 rounded-xl shadow-lg transform transition active:scale-95 mt-2"
                         >
-                            Đăng Ký Tài Khoản
+                            {isRegistering ? "Đăng tạo tài khoản" : "Đăng kí"}
                         </button>
                     </div>
 
                     <div className="mt-8 pt-6 border-t border-gray-100 text-center">
                         <p className="text-sm text-gray-600">
-                            Đã có tài khoản?{" "}
+                            Đã có tài khoản?
                             <button
                                 onClick={() => navigate("/login")}
                                 className="font-bold text-[#2C8DE0] hover:underline"

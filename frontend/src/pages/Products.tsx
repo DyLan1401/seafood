@@ -18,10 +18,12 @@ export default function Products() {
                 params: {
                     search: searchQuery,
                     limit: 20
-                }
+                },
             });
             return res.data.items;
         },
+        // staleTime: 1000 * 60 * 5, // 5 phút: Trong 5 phút này, nếu searchQuery không đổi, nó sẽ KHÔNG gọi API nữa
+
     });
 
     if (isLoading) return (

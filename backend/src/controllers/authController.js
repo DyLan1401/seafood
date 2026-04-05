@@ -2,6 +2,89 @@ import * as authService from '../services/authService.js';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+export const userList = async (req, res) => {
+    try {
+
+        const data = await authService.userList();
+
+        if (!data.affectedRows === 0) {
+            return res.status(401).json({ error: "user đang trống" });
+        }
+
+        res.status(200).json(data);
+
+    } catch (error) {
+        res.status(500).json({
+            message: "đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
+    }
+}
+
+export const userDetail = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const data = await authService.userDetail({ id });
+
+        if (!data === 0) {
+            return res.status(401).json({ error: "không tìm thấy user" });
+        }
+
+        res.status(200).json(data);
+
+    } catch (error) {
+        res.status(500).json({
+            message: "đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
+    }
+}
+
+export const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = await authService.deleteUser({ id });
+        if (!data) {
+            return res.status(404).json({ message: `không tìm thấy user có id: ${id}` });
+        }
+
+        res.status(200).json({
+            message: `Đã xóa thành công user có id: ${id}`
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
+    }
+}
+
+export const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { email, password, role } = req.body;
+
+        const data = await authService.userList();
+
+        if (!data) {
+            return res.status(401).json({ error: "không tìm thấy user có id:" + { email, password, role, id } });
+        }
+
+
+        res.status(200).json({
+            message: "Đã cập nhật thành công user có id:" + { id }
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
+    }
+}
+
+
 //đăng nhập
 export const Login = async (req, res) => {
     try {
@@ -34,8 +117,10 @@ export const Login = async (req, res) => {
             user: { id: user.id, email: user.email, role: user.role },
         });
     } catch (error) {
-        console.error("Login Error:", error);
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({
+            message: "đã xảy ra lỗi hệ thống",
+            error: error.message
+        });
     }
 };
 

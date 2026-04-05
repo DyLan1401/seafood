@@ -1,39 +1,37 @@
-import { useState } from "react";
-import api from "../api/axios";
-import { useAuthStore } from "../store/authStore"; // Import store
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
+import { useUsers } from "../hooks/useUsers";
 import { useToast } from "../hooks/useToast";
 import { ToastContainer } from "../component/ToastContainer";
+import { userInput } from "../lib/validitions";
 
 export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const navigate = useNavigate();
+
     const { toasts, show } = useToast();
+    const { register, handleSubmit, formState: { errors } } = useForm(userInput);
+    const { login, isLoggingIn } = useUsers();
 
-    const setLogin = useAuthStore((state) => state.setLogin);
+    const handleLogin = (data: any) => {
+        login(data, {
+            onSuccess: (res) => {
+                show("Đăng nhập thành công!", "success");
+                if (res.role === "admin") {
+                    navigate("/dashboard")
+                } else {
+                    navigate("/");
+                }
 
-    const handleLogin = async () => {
-        try {
-            const res = await api.post("/user/login", { email, password });
-            console.log(res.data.user); // 👈 kiểm tra role có trả về không
-
-            // Lưu Token và thông tin Admin vào Zustand
-            setLogin(res.data.token, res.data.user);
-            show("Đăng nhập thành công!", "success");
-
-            if (res.data.user.role === "admin") {
-                navigate("/dashboard");
-            } else {
-                navigate("/");
+            },
+            onError: (error: any) => {
+                // Xử lý lỗi riêng cho UI nếu cần
+                const errorMsg = error?.response?.data?.message || "Sai email hoặc mật khẩu";
+                show(errorMsg, "error");
             }
-        } catch (err: unknown) {
-            show("Sai tài khoản hoặc mật khẩu", "error");
-        }
+        });
     };
-
     return (
 
         <div>
@@ -51,30 +49,31 @@ export default function Login() {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                             <input
-                                type="email"
                                 placeholder="example@gmail.com"
-                                onChange={(e) => setEmail(e.target.value)}
                                 className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#2C8DE0] focus:border-transparent transition-all"
+                                type="email"
+                                {...register("email", { required: "Email là bắt buộc" })}
                             />
+                            {errors.email && <span className="error">{errors.email.message as string}</span>}
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
                             <input
-                                type="password"
                                 placeholder="••••••••"
-                                onChange={(e) => setPassword(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                                 className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#2C8DE0] focus:border-transparent transition-all"
+                                type="password"
+                                {...register("password", { required: "Password là bắt buộc" })}
                             />
+                            {errors.password && <span className="error">{errors.password.message as string}</span>}
                         </div>
 
                         <button
-                            onClick={handleLogin}
+                            onClick={handleSubmit(handleLogin)}
                             className="w-full bg-[#2C8DE0] hover:bg-[#1a6fb8] text-white font-bold py-3 rounded-xl shadow-lg transform transition active:scale-95 mt-2"
 
                         >
-                            Đăng Nhập
+                            {isLoggingIn ? "Đang chuyển trang" : "Đăng nhập"}
                         </button>
                     </div>
 

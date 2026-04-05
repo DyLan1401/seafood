@@ -1,7 +1,19 @@
 import pool from "../utils/db.js";
 
+// let productsCache = {};
 //
 export const getAllProducts = async ({ page = 1, limit = 10, search = "", category = "" }) => {
+
+  // const cacheKey = `products_p${page}_l${limit}_s${search}_c${category}`;
+
+
+  // // BƯỚC 1: Kiểm tra xem trong túi có chưa?
+  // if (productsCache[cacheKey]) {
+  //   console.log("⚡ Lấy dữ liệu từ Backend Cache");
+  //   return productsCache[cacheKey];
+  // }
+
+
   const offset = (page - 1) * limit;
   const params = [];
   let whereClause = " WHERE 1=1 ";
@@ -32,7 +44,7 @@ export const getAllProducts = async ({ page = 1, limit = 10, search = "", catego
   //
   const [rows] = await pool.query(dataSql, [...params, limit, offset]);
   //
-  return {
+  const result = {
     items: rows,
     pagination: {
       totalItems: total,
@@ -41,6 +53,10 @@ export const getAllProducts = async ({ page = 1, limit = 10, search = "", catego
       limit: limit
     }
   };
+
+  // productsCache[cacheKey] = result;
+
+  return result;
 };
 
 //
