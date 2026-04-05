@@ -1,7 +1,21 @@
 import pool from "../utils/db.js";
 
+let categoriesCache = {};
+
 //lấy danh mục
 export const getCategory = async ({ page = 1, limit = 10 }) => {
+
+
+  const cacheKey = `categories_p${page}_l${limit}`;
+
+
+  // BƯỚC 1: Kiểm tra xem trong túi có chưa?
+  if (categoriesCache[cacheKey]) {
+    console.log("⚡ Lấy dữ liệu từ Backend Cache");
+    return categoriesCache[cacheKey];
+  }
+
+
   const offset = (page - 1) * limit;
 
   // 1. Lấy tổng số danh mục để tính tổng số trang
@@ -18,7 +32,7 @@ export const getCategory = async ({ page = 1, limit = 10 }) => {
   const [rows] = await pool.query(dataSql, [limit, offset]); // Bỏ dấu phẩy thừa ở đây
 
   // Trả về theo cấu trúc thống nhất để Frontend dễ xử lý
-  return {
+  const result = {
     items: rows,
     pagination: {
       totalItems: total,
@@ -27,6 +41,10 @@ export const getCategory = async ({ page = 1, limit = 10 }) => {
       limit: limit
     }
   };
+
+  categoriesCache[cacheKey] = result;
+
+  return result;
 };
 
 export const getCategoryDetail = async ({ slug }) => {

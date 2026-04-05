@@ -1,38 +1,26 @@
 import Footer from "../component/Footer";
 import Header from "../component/Header";
-import { useQuery } from "@tanstack/react-query"
 import ProductCard from "../component/ProductCard";
-import type { Product } from "../types/product";
-import api from "../api/axios"
 import { Link } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
-
+import { useProduct } from "../hooks/useProducts";
+import type { Product } from "../types/product";
 export default function Products() {
     const [searchParams] = useSearchParams();
-    const searchQuery = searchParams.get("search") || "";
+    const searchQuery = (searchParams.get("search") || "").toLowerCase();
+    const { products, isErrorProducts, isLoadingProducts } = useProduct();
 
-    const { data: product, isLoading, error } = useQuery<Product[]>({
-        queryKey: ["products", searchQuery],
-        queryFn: async () => {
-            const res = await api.get("/product/all", {
-                params: {
-                    search: searchQuery,
-                    limit: 20
-                },
-            });
-            return res.data.items;
-        },
-        // staleTime: 1000 * 60 * 5, // 5 phút: Trong 5 phút này, nếu searchQuery không đổi, nó sẽ KHÔNG gọi API nữa
 
-    });
+    const filtredProducts = products?.filter((p: Product) =>
+        p.name.toLowerCase().includes(searchQuery))
 
-    if (isLoading) return (
+    if (isLoadingProducts) return (
         <div className="flex justify-center items-center min-h-[400px] font-medium text-gray-500">
             Đang tải sản phẩm...
         </div>
     );
 
-    if (error) return (
+    if (isErrorProducts) return (
         <div className="text-center py-10 text-red-500">
             Lỗi tải dữ liệu. Vui lòng thử lại.
         </div>
@@ -50,8 +38,8 @@ export default function Products() {
 
                 {/*  */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 p-2 md:p-4 bg-[#FFF2E8] rounded-b-lg border-x border-b border-[#e5e7eb]">
-                    {product && product.length > 0 ? (
-                        product.map((p) => (
+                    {filtredProducts && filtredProducts.length > 0 ? (
+                        filtredProducts.map((p: Product) => (
                             <Link
                                 key={p.id}
                                 to={`/product/${p.slug}`}
