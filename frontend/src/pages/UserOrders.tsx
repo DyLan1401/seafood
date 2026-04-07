@@ -5,6 +5,7 @@ import Footer from "../component/Footer";
 //hooks
 import { useOrders } from "../hooks/useOrder";
 import type { Order } from "../types/order";
+import { Link } from "react-router-dom";
 export default function MyOrders() {
 
 
@@ -41,7 +42,8 @@ export default function MyOrders() {
                 {/* thông tin đơn hàng*/}
                 <div className="grid grid-cols-1 gap-4">
                     {myOrders.map((order: Order) => (
-                        <div
+                        <Link
+                            to={`/order/${order.id}`}
                             key={order.id}
                             className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
                         >
@@ -66,7 +68,7 @@ export default function MyOrders() {
                                     {order.total?.toLocaleString() || 0}đ
                                 </span>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
 

@@ -13,6 +13,7 @@ import UserOrders from './pages/UserOrders'
 import Error404 from './pages/error404'
 import Dashboard from './pages/Dashboard'
 import { ToastContainer } from './component/ToastContainer'
+import OrderDetail from './pages/OrderDetail'
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
         <Route path='/categories' element={<Categories />} />
         <Route path='/my-orders' element={<UserOrders />} />
         <Route path='/dashboard' element={<Dashboard />} />
+        <Route path="/order/:id" element={<OrderDetail />} />
 
         <Route path="*" element={<Error404 />} />
       </Routes>
