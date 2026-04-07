@@ -6,29 +6,35 @@ import ProductDetail from './pages/ProductDetail'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import Login from './pages/Login'
-import Resigter from './pages/Resigter'
+import Resigter from './pages/Register'
 import CategoryDetail from './pages/CategoryDetail'
 import Categories from './pages/Categories'
 import UserOrders from './pages/UserOrders'
 import Error404 from './pages/error404'
 import Dashboard from './pages/Dashboard'
+import { ToastContainer } from './component/ToastContainer'
+
 function App() {
 
   return (
-    <Routes>        <Route path='/' element={<Home />} />
-      <Route path='/products' element={<Products />} />
-      <Route path="/product/:slug" element={<ProductDetail />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/checkout" element={<Checkout />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Resigter />} />
-      <Route path="/product/category/:slug" element={<CategoryDetail />} />
-      <Route path='/categories' element={<Categories />} />
-      <Route path='/my-orders' element={<UserOrders />} />
-      <Route path='/dashboard' element={<Dashboard />} />
+    <>
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/products' element={<Products />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Resigter />} />
+        <Route path="/product/category/:slug" element={<CategoryDetail />} />
+        <Route path='/categories' element={<Categories />} />
+        <Route path='/my-orders' element={<UserOrders />} />
+        <Route path='/dashboard' element={<Dashboard />} />
 
-      <Route path="*" element={<Error404 />} />
-    </Routes>
+        <Route path="*" element={<Error404 />} />
+      </Routes>
+      <ToastContainer />
+    </>
   )
 }
 

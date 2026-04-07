@@ -11,7 +11,7 @@ export default function ProductCard({ name, slug, image_url }: Category) {
             {/* 2. Phần ảnh: Sử dụng aspect-video hoặc tỉ lệ cố định để ảnh không bị bẹp trên các màn hình khác nhau */}
             <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 shrink-0">
                 {image_url ? (
-                    <img className="object-cover w-full h-full" src={image_url} alt={name} />
+                    <img loading="lazy" className="object-cover w-full h-full" src={image_url} alt={name} />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
                 )}

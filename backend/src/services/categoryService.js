@@ -4,14 +4,10 @@ let categoriesCache = {};
 
 //lấy danh mục
 export const getCategory = async ({ page = 1, limit = 10 }) => {
-
-
   const cacheKey = `categories_p${page}_l${limit}`;
-
 
   // BƯỚC 1: Kiểm tra xem trong túi có chưa?
   if (categoriesCache[cacheKey]) {
-    console.log("⚡ Lấy dữ liệu từ Backend Cache");
     return categoriesCache[cacheKey];
   }
 
@@ -47,6 +43,7 @@ export const getCategory = async ({ page = 1, limit = 10 }) => {
   return result;
 };
 
+//chi tiết danh mục
 export const getCategoryDetail = async ({ slug }) => {
   const [rows] = await pool.query(
     `SELECT id, name, slug, image_url, created_at FROM categories`
@@ -55,14 +52,16 @@ export const getCategoryDetail = async ({ slug }) => {
   return rows[0];
 };
 
+//tạo danh mục
 export const createCategory = async ({ name, slug, image_url }) => {
   const [rows] = await pool.query(
     `INSERT INTO categories (name,slug,image_url,created_at)  VALUES (?,?,?,NOW()) `
     , [name, slug, image_url]
   )
   return rows;
-}
+};
 
+//cập nhật danh mục
 export const UpdateCategory = async ({ id, name, slug, image_url }) => {
   const [rows] = await pool.query(
     `UPDATE categories SET
@@ -74,8 +73,9 @@ export const UpdateCategory = async ({ id, name, slug, image_url }) => {
     , [name, slug, image_url, id]
   );
   return rows;
-}
+};
 
+//xóa danh mục
 export const DeleteCategory = async ({ id }) => {
   const [rows] = await pool.query(
     `DELETE FROM categories WHERE id = ?`
@@ -83,4 +83,4 @@ export const DeleteCategory = async ({ id }) => {
   );
   return rows;
 
-}
+};

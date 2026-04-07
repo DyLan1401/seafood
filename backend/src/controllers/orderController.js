@@ -1,6 +1,6 @@
 import * as orderService from '../services/orderService.js';
 
-//lấy đơn hàng
+//danh sách đơn hàng
 export const getAllOrders = async (req, res) => {
     try {
         //
@@ -20,8 +20,6 @@ export const getAllOrders = async (req, res) => {
 //thêm đơn hàng mới
 export const createOrder = async (req, res) => {
     try {
-        console.log("Dữ liệu Body:", req.body);
-        console.log("Dữ liệu Admin từ Token:", req.user);
         const { userId, customerName, phone, address, note, items } = req.body;
         //
         // Kiểm tra thông tin khách hàng ở đây 
@@ -34,8 +32,10 @@ export const createOrder = async (req, res) => {
         res.status(201).json(newOrder);
         //
     } catch (error) {
-        console.error("Order Error:", error);
-        res.status(400).json({ error: error || "Lỗi khi tạo đơn hàng" });
+        res.status(500).json({
+            message: "Đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
     }
 };
 
@@ -63,7 +63,7 @@ export const updateOrder = async (req, res) => {
         const { id } = req.params;
         const { status } = req.body;
         //
-        const data = await orderService.updateOrder(id, status);
+        const data = await orderService.updateOrder({ id, status });
         //Kiểm tra nếu không có dữ liệu trả về
         if (!data) {
             return res.status(404).json({ message: "Không tìm thấy đơn hàng để cập nhật" });
@@ -81,19 +81,38 @@ export const updateOrder = async (req, res) => {
 export const getMyOrders = async (req, res) => {
     try {
         const userId = req.user?.id;
-        console.log("req.user đầy đủ:", req.user); // Xem toàn bộ object
-        console.log("userId:", userId);
 
         if (!userId) {
             return res.status(401).json({ message: "Không tìm thấy thông tin người dùng" });
         }
 
-        const data = await orderService.getOrdersByUserId(userId);
-        console.log("Kết quả query:", data);
+        const data = await orderService.getOrdersByUserId({ id });
+
         res.status(200).json(data || []);
     } catch (error) {
-        // Log toàn bộ error object, không chỉ message
-        console.error("Lỗi Controller đầy đủ:", error);
-        res.status(500).json({ message: "Lỗi hệ thống", detail: error.message });
+        res.status(500).json({
+            message: "Đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
+    }
+};
+
+//xóa đơn hàng
+export const deleteOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        //
+        const data = await orderService.deleteOrder({ id });
+        if (!data) {
+            return res.status(404).json({ message: "Không tìm thấy đơn hàng để xoá" });
+        }
+        //
+        res.status(200).json(data);
+        //
+    } catch (error) {
+        res.status(500).json({
+            message: "Đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
     }
 };

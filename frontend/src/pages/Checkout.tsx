@@ -1,90 +1,116 @@
-import { useState } from "react";
-import { useCartStore } from "../store/cartStore";
-import api from "../api/axios"
+//lib
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/authStore";
-import { useToast } from "../hooks/useToast";
-import { ToastContainer } from "../component/ToastContainer";
+import { useForm } from "react-hook-form";
+
+//components
 import Header from "../component/Header";
 import Footer from "../component/Footer";
-export default function Checkout() {
-    const { items, clearCart } = useCartStore();
-    const navigate = useNavigate();
-    const { isAuth, user } = useAuthStore();
-    const [customerName, setCustomerName] = useState("");
-    const [phone, setPhone] = useState("");
-    const [address, setAddress] = useState("");
-    const [note, setNote] = useState("");
-    const [loading, setLoading] = useState(false);
-    const { toasts, show } = useToast();
 
-    const handleSubmit = async () => {
-        if (!isAuth) {
-            alert("Vui lòng đăng nhập để đặt hàng!");
-            return;
+//hooks
+import { useOrders } from "../hooks/useOrder";
+
+//zustand
+import { useCartStore } from "../store/cartStore";
+import { useAuthStore } from "../store/authStore";
+import { useToastStore } from "../store/useToastStore";
+
+
+//types
+import type { AxiosError } from "axios";
+import type { CreateOrderPayload, CheckoutFormData } from "../types/order";
+
+
+export default function Checkout() {
+
+    // lấy id từ user trong store
+    const { isAuth, user } = useAuthStore();
+    const { items, clearCart } = useCartStore();
+    const showToast = useToastStore((state) => state.show);
+    const { createOrder, isCreating } = useOrders();
+    const navigate = useNavigate();
+
+
+
+    // Khởi tạo React Hook Form
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<CheckoutFormData>({
+        defaultValues: {
+            customerName: user?.username || "", // Điền sẵn tên nếu có
+            phone: "",
+            address: "",
+            note: ""
         }
-        if (items.length === 0) return alert("Giỏ hàng đang trống");
-        if (!customerName || !phone || !address) return alert("Vui lòng điền đủ thông tin bắt buộc");
+    });
+    const handleOrder = async (data: CheckoutFormData) => {
+        // kiểm tra user
+        if (!isAuth) return showToast("Vui lòng đăng nhập để đặt hàng!", "error");
+        //kiểm tra số lượng
+        if (items.length === 0) return showToast("Giỏ hàng trống!", "error");
 
         try {
-            setLoading(true);
-            const token = localStorage.getItem("token");
-            const res = await api.post("/order/create", {
-                userId: user.id,
-                customerName,
-                phone,
-                address,
-                note,
-                items: items.map((i) => ({
+            const orderPayload: CreateOrderPayload = {
+                userId: user?.id as string | number,
+                ...data,
+                items: items.map(i => ({
                     productId: i.productId,
-                    qty: i.qty,
-                })),
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                    qty: i.qty
+                }))
+            };
 
+            //
+            const res = await createOrder(orderPayload);
+            showToast("Đặt hàng thành công! Mã đơn: " + (res.id || res.data?.id), "success");
             clearCart();
-            show("Đặt hàng thành công. Mã đơn: " + res.data.id, "success");
-            navigate("/");
+            setTimeout(() => navigate("/"), 2000);
+
         } catch (err: unknown) {
-            show(err.response?.data?.error || "Lỗi hệ thống", "error");
-        } finally {
-            setLoading(false);
+            const axiosError = err as AxiosError<{ message: string }>;
+            const errorMsg = axiosError?.response?.data?.message || "Có lỗi xảy ra khi đặt hàng";
+            showToast(errorMsg, "error");
         }
     };
 
     return (
-        <div className="bg-gray-50 min-h-screen">
-            <ToastContainer toasts={toasts} />
+        <>
             <Header />
+            {/* Main */}
             <div className="container mx-auto p-4 md:py-10">
                 <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 border-b pb-4">Thanh toán</h1>
 
-                {/*  */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-                    {/* */}
+                {/* Form thông tin nhận hàng */}
+                <form
+                    onSubmit={handleSubmit(handleOrder)}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="md:col-span-2 space-y-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                         <h2 className="text-lg font-semibold mb-4 text-[#BF4E2C]">Thông tin nhận hàng</h2>
-
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm font-medium text-gray-600">Họ và tên *</label>
                                 <input
                                     placeholder="Nguyễn Văn A"
-                                    value={customerName}
-                                    onChange={(e) => setCustomerName(e.target.value)}
                                     className="border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-[#2C8DE0] outline-none transition-all"
+                                    {...register("customerName", { required: "*Bắt buộc*" })}
                                 />
+                                {errors.customerName && <span className="error text-red-500">{errors.customerName.message as string}</span>}
+
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label className="text-sm font-medium text-gray-600">Số điện thoại *</label>
                                 <input
                                     placeholder="09xxx..."
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
                                     className="border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-[#2C8DE0] outline-none transition-all"
+                                    {...register("phone", {
+                                        required: "*Bắt buộc*", pattern: {
+                                            value: /^(0[3|5|7|8|9])[0-9]{8}$/,
+                                            message: "Số điện thoại không đúng định dạng (VD: 0912345678)"
+                                        }
+                                    })}
                                 />
+                                {errors.phone && <span className="error text-red-500">{errors.phone.message as string}</span>}
+
                             </div>
                         </div>
 
@@ -92,10 +118,11 @@ export default function Checkout() {
                             <label className="text-sm font-medium text-gray-600">Địa chỉ giao hàng *</label>
                             <input
                                 placeholder="Số nhà, tên đường, phường/xã..."
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
                                 className="border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-[#2C8DE0] outline-none transition-all"
+                                {...register("address", { required: "*Bắt buộc*" })}
                             />
+                            {errors.address && <span className="error text-red-500">{errors.address.message as string}</span>}
+
                         </div>
 
                         <div className="flex flex-col gap-1">
@@ -103,23 +130,23 @@ export default function Checkout() {
                             <textarea
                                 rows={4}
                                 placeholder="Lời nhắn cho cửa hàng hoặc tài xế..."
-                                value={note}
-                                onChange={(e) => setNote(e.target.value)}
                                 className="border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-[#2C8DE0] outline-none transition-all"
+                                {...register("note")}
                             />
+                            {errors.note && <span className="error text-red-500">{errors.note.message as string}</span>}
+
                         </div>
                     </div>
 
-                    {/* */}
+                    {/* Tóm tắt đơn hàng */}
                     <div className="md:col-span-1">
                         <div className="bg-white p-6 rounded-2xl shadow-md border-2 border-[#2C8DE0] sticky top-4">
                             <h2 className="text-lg font-semibold mb-4">Đơn hàng của bạn</h2>
 
-                            {/* */}
                             <div className="max-h-60 overflow-y-auto mb-4 border-b pb-4 space-y-2">
                                 {items.map((item, idx) => (
                                     <div key={idx} className="flex justify-between text-sm">
-                                        <span className="text-gray-600 truncate max-w-[150px]">{item.name || "Sản phẩm"}</span>
+                                        <span className="text-gray-600 truncate max-w-37.5">{item.name || "Sản phẩm"}</span>
                                         <span className="font-medium text-gray-900">x{item.qty}</span>
                                     </div>
                                 ))}
@@ -127,15 +154,15 @@ export default function Checkout() {
                             </div>
 
                             <button
-                                onClick={handleSubmit}
-                                disabled={loading}
+                                type="submit"
+                                disabled={isCreating}
                                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 transform active:scale-95 
-                                    ${loading
+                                    ${isCreating
                                         ? "bg-gray-300 cursor-not-allowed"
                                         : "bg-[#2C8DE0] text-white hover:bg-white hover:text-[#2C8DE0] border-2 border-[#2C8DE0]"
                                     }`}
                             >
-                                {loading ? (
+                                {isCreating ? (
                                     <span className="flex items-center justify-center gap-2">
                                         <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
@@ -145,15 +172,11 @@ export default function Checkout() {
                                     </span>
                                 ) : "Xác nhận đặt hàng"}
                             </button>
-
-                            <p className="text-xs text-center text-gray-400 mt-4">
-                                Bằng cách đặt hàng, bạn đồng ý với các điều khoản của chúng tôi.
-                            </p>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
             <Footer />
-        </div>
+        </>
     );
 }

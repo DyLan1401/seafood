@@ -1,50 +1,44 @@
-import { useQuery } from "@tanstack/react-query";
-import api from "../api/axios";
+//components
 import Header from "../component/Header";
 import Footer from "../component/Footer";
+
+//hooks
+import { useOrders } from "../hooks/useOrder";
+import type { Order } from "../types/order";
 export default function MyOrders() {
 
-    type Order = {
-        id: number
-        created_at: string;
-        total: number
-    }
-    const { data: orders, isError, isLoading } = useQuery({
-        queryKey: ['my-orders'],
-        queryFn: async () => {
-            const res = await api.get('/order/my-orders');
-            return res.data;
-        },
-        retry: 0
-    });
+
+    const { userOrder, isLoadingUserOrder, isErrorUserOrder } = useOrders();
+
 
 
     // Trạng thái đang tải
-    if (isLoading) return <div className="p-10 text-center animate-pulse">Đang tải đơn hàng...</div>;
+    if (isLoadingUserOrder) return <div className="p-10 text-center animate-pulse">Đang tải đơn hàng...</div>;
 
     // Trạng thái lỗi
-    if (isError) return (
+    if (isErrorUserOrder) return (
         <div className="p-10 text-center text-red-500 bg-red-50 rounded-lg m-4">
             Không thể kết nối với máy chủ. Vui lòng thử lại sau.
         </div>
     );
 
     // Trạng thái không có dữ liệu
-    if (!orders || orders.length === 0) return (
+    if (!userOrder || userOrder.length === 0) return (
         <div className="p-10 text-center border-2 border-dashed border-gray-200 rounded-xl m-4 text-gray-500">
             Bạn chưa có đơn hàng nào trong lịch sử.
         </div>
     );
 
     return (
-        <div className="mx-auto container">
+        <>
             <Header />
+            {/* Main */}
             <div className="container mx-auto p-4  max-w-4xl">
                 <h1 className="text-2xl font-bold mb-6 text-gray-800">Lịch sử đơn hàng</h1>
 
-                {/* */}
+                {/* thông tin đơn hàng*/}
                 <div className="grid grid-cols-1 gap-4">
-                    {orders.map((order: Order) => (
+                    {userOrder.map((order: Order) => (
                         <div
                             key={order.id}
                             className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
@@ -77,6 +71,6 @@ export default function MyOrders() {
             </div>
             <Footer />
 
-        </div>
+        </>
     );
 }

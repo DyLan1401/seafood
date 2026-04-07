@@ -86,7 +86,7 @@ export const getOrderDetail = async ({ id }) => {
 };
 
 //cập nhật đơn hàng
-export const updateOrder = async (id, status) => {
+export const updateOrder = async ({ id, status }) => {
     //
     const allowed = ["pending", "confirmed", "shipping", "done", "canceled"];
     //
@@ -106,7 +106,7 @@ export const updateOrder = async (id, status) => {
 };
 
 //lịch sử đơn hàng
-export const getOrdersByUserId = async (userId) => {
+export const getOrdersByUserId = async ({ userId }) => {
     const [rows] = await pool.query(
         'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
         [userId]
@@ -114,4 +114,13 @@ export const getOrdersByUserId = async (userId) => {
     return rows;
 
 
+};
+
+//xóa đơn hàng
+export const deleteOrder = async ({ id }) => {
+    const [rows] = await pool.query
+        (`DELETE FROM orders where id = ?`
+            , [id]
+        )
+    return rows;
 };

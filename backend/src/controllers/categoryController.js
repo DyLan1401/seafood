@@ -18,7 +18,7 @@ export const getAllCategory = async (req, res) => {
     }
 };
 
-//
+//chi tiết danh mục
 export const getCategoryDetail = async (req, res) => {
     try {
         //
@@ -40,6 +40,7 @@ export const getCategoryDetail = async (req, res) => {
     }
 }
 
+//thêm danh mục
 export const AddCategory = async (req, res) => {
     try {
         const { name, slug, image_url } = req.body;
@@ -64,7 +65,7 @@ export const AddCategory = async (req, res) => {
     }
 };
 
-//
+//cập nhật danh mục
 export const UpdateCategory = async (req, res) => {
     try {
         const { id } = req.params;
@@ -86,7 +87,7 @@ export const UpdateCategory = async (req, res) => {
     }
 }
 
-
+//xóa danh mục
 export const DeleteCategory = async (req, res) => {
     try {
         const { id } = req.params;

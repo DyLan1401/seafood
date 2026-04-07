@@ -54,10 +54,14 @@ export const getProductsByCategory = async (req, res) => {
         res.status(200).json(data);
         //
     } catch (error) {
-        res.status(500).json({ error: error });
+        res.status(500).json({
+            message: "Đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
     }
 }
 
+//tạo sản phẩm
 export const createProduct = async (req, res) => {
     try {
         const { name, slug, price, sale_price, stock, image_url, description, origin, weight, category_id } = req.body;
@@ -82,7 +86,7 @@ export const createProduct = async (req, res) => {
     }
 };
 
-
+//cập nhập sản phẩm
 export const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
@@ -107,6 +111,7 @@ export const updateProduct = async (req, res) => {
     }
 };
 
+//xóa sản phẩm
 export const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;

@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
-import api from "../api/axios";
-import { useToast } from "../hooks/useToast";
-import { ToastContainer } from "../component/ToastContainer";
-import type { Order } from "../types/order";
+//hooks
+import { useOrders } from "../hooks/useOrder";
+
+//zustand
 import { useAuthStore } from "../store/authStore";
+import { useToastStore } from "../store/useToastStore";
+
+//type
+import type { Order } from "../types/order";
+
 
 const STATUSES = ["pending", "confirmed", "shipping", "done", "cancelled"];
 
@@ -26,50 +30,27 @@ const STATUS_COLOR: Record<string, string> = {
 
 
 export default function Dashboard() {
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [loading, setLoading] = useState(true);
-    const { toasts, show } = useToast();
+
+    const showToast = useToastStore((state) => state.show);
     const { user, logout } = useAuthStore();
+    const { orders, isLoadingOrder, updateOrder, isUpdating } = useOrders();
 
-    const fetchOrders = async () => {
-        try {
-            const res = await api.get("/order/all");
-            setOrders(res.data);
-        } catch {
-            show("Không thể tải đơn hàng", "error");
-        } finally {
-            setLoading(false);
-        }
-    };
 
-    const handleUpdateStatus = async (id: number, status: string) => {
-        try {
-            await api.patch(`/order/${id}/status`, { status });
-            setOrders((prev) =>
-                prev.map((o) => (o.id === id ? { ...o, status } : o))
-            );
-            show("Cập nhật trạng thái thành công", "success");
-        } catch {
-            show("Cập nhật thất bại", "error");
-        }
-    };
 
-    useEffect(() => { fetchOrders(); }, []);
+
 
     return (
         <div>
-
             <div className="w-full h-16 bg-blue-900 text-white text-sm text-right p-4" >
                 <div>  Hi, {user?.email}</div>
                 <button onClick={() => { logout() }} className=" text-sm cursor-pointer  text-red-600 hover:text-black transition">Đăng xuất</button>
 
             </div >
             <div className="min-h-screen bg-gray-50 px-6">
-                <ToastContainer toasts={toasts} />
 
                 <h1 className="text-2xl font-bold text-[#BF4E2C] mb-6">Quản lý đơn hàng</h1>
 
-                {loading ? (
+                {isLoadingOrder ? (
                     <p className="text-gray-500">Đang tải...</p>
                 ) : orders.length === 0 ? (
                     <p className="text-gray-500">Không có đơn hàng nào.</p>
@@ -89,21 +70,33 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {orders.map((order) => (
+                                {orders.map((order: Order) => (
                                     <tr key={order.id} className="hover:bg-gray-50 transition">
                                         <td className="px-4 py-3 font-medium">#{order.id}</td>
                                         <td className="px-4 py-3">{order.customer_name}</td>
                                         <td className="px-4 py-3">{order.phone}</td>
-                                        <td className="px-4 py-3 max-w-[150px] truncate">{order.address}</td>
-                                        <td className="px-4 py-3 max-w-[120px] truncate">{order.note || "—"}</td>
+                                        <td className="px-4 py-3 max-w-37.5 truncate">{order.address}</td>
+                                        <td className="px-4 py-3 max-w-30 truncate">{order.note || "—"}</td>
                                         <td className="px-4 py-3 font-semibold text-[#BF4E2C]">
                                             {order.total.toLocaleString()}đ
                                         </td>
                                         <td className="px-4 py-3">
                                             <select
                                                 value={order.status}
-                                                onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
-                                                className={`text-xs font-medium rounded-lg px-2 py-1 border-0 outline-none cursor-pointer ${STATUS_COLOR[order.status]}`}
+                                                onChange={(e) => {
+                                                    const newStatus = e.target.value
+                                                    updateOrder(
+                                                        { id: order.id, status: newStatus },
+                                                        {
+                                                            onSuccess: () => showToast(`Đã chuyển sang: ${STATUS_LABEL[newStatus]}`, "success"),
+                                                            onError: () => showToast("cập nhật thất bại", "error")
+                                                        }
+                                                    );
+                                                }}
+                                                className={`text-xs font-medium rounded-lg px-2 py-1 border-0 outline-none cursor-pointer 
+                                                ${STATUS_COLOR[order.status]}
+                                                ${isUpdating ? "opacity-50 cursor-not-allowed" : "opacity-100"}`}
+
                                             >
                                                 {STATUSES.map((s) => (
                                                     <option key={s} value={s}>{STATUS_LABEL[s]}</option>
@@ -120,6 +113,6 @@ export default function Dashboard() {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }

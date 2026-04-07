@@ -3,11 +3,12 @@ import { getAllCategory, getCategoryDetail, AddCategory, UpdateCategory, DeleteC
 import { verifyToken } from '../middleware/auth.middleware.js';
 //
 const router = Router();
-//
-router.get("/all", getAllCategory);
-router.post("/create", AddCategory);
 
-//
+//router tĩnh
+router.get("/all", getAllCategory);
+
+//router action
+router.post("/create", AddCategory);
 router.put("/update/:id", UpdateCategory);
 router.delete("/delete/:id", DeleteCategory)
 

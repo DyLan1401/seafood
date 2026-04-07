@@ -1,42 +1,69 @@
-import { useNavigate } from "react-router-dom";
+//lib
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { userInput } from "../lib/validitions";
+import { zodResolver } from "@hookform/resolvers/zod"; // Thêm dòng này
+import { z } from "zod"; // Đảm bảo đã import zod
+
+//components
 import Header from "../component/Header";
 import Footer from "../component/Footer";
+
+//hooks
 import { useUsers } from "../hooks/useUsers";
-import { useToast } from "../hooks/useToast";
-import { ToastContainer } from "../component/ToastContainer";
-import { userInput } from "../lib/validitions";
+import { useToastStore } from "../store/useToastStore";
+
+//types
+import type { AxiosError } from "axios";
+type LoginFormInput = z.infer<typeof userInput>;
+
 
 export default function Login() {
-    const navigate = useNavigate();
 
-    const { toasts, show } = useToast();
-    const { register, handleSubmit, formState: { errors } } = useForm(userInput);
+    const navigate = useNavigate();
+    const showToast = useToastStore((state) => state.show);
     const { login, isLoggingIn } = useUsers();
 
-    const handleLogin = (data: any) => {
+    const { register,
+        handleSubmit,
+        formState: { errors } } =
+        useForm<LoginFormInput>({
+            resolver: zodResolver(userInput),
+            defaultValues: {
+                email: "",
+                password: ""
+            }
+        });
+
+    //hàm đăng nhập
+    const handleLogin = (data: LoginFormInput) => {
         login(data, {
             onSuccess: (res) => {
-                show("Đăng nhập thành công!", "success");
-                if (res.role === "admin") {
+                showToast("Đăng nhập thành công!", "success");
+
+                //kiểm tra
+                const userRole = res?.user?.role || res?.data?.user?.role;
+
+                //kiểm tra chuyển hướng
+                if (userRole === "admin") {
                     navigate("/dashboard")
                 } else {
                     navigate("/");
                 }
 
             },
-            onError: (error: any) => {
-                // Xử lý lỗi riêng cho UI nếu cần
-                const errorMsg = error?.response?.data?.message || "Sai email hoặc mật khẩu";
-                show(errorMsg, "error");
+            onError: (error: unknown) => {
+                const axiosError = error as AxiosError<{ message: string }>;
+                const errorMsg = axiosError?.response?.data?.message || "Sai email hoặc mật khẩu";
+                showToast(errorMsg, "error");
             }
         });
     };
     return (
 
-        <div>
-            <ToastContainer toasts={toasts} />
+        <>
             <Header />
+            {/* Main */}
             <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
                 <div className="w-full max-w-md bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
 
@@ -44,15 +71,17 @@ export default function Login() {
                         <h1 className="text-2xl md:text-3xl font-bold text-[#BF4E2C]">Đăng nhập</h1>
                         <p className="text-gray-500 text-sm mt-2">Đăng nhập để trải nghiệm chi tiết hơn !!!</p>
                     </div>
-
-                    <div className="space-y-4">
+                    {/* Form đăng nhập */}
+                    <form
+                        onSubmit={handleSubmit(handleLogin)}
+                        className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                             <input
                                 placeholder="example@gmail.com"
                                 className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#2C8DE0] focus:border-transparent transition-all"
                                 type="email"
-                                {...register("email", { required: "Email là bắt buộc" })}
+                                {...register("email")}
                             />
                             {errors.email && <span className="error">{errors.email.message as string}</span>}
                         </div>
@@ -63,20 +92,21 @@ export default function Login() {
                                 placeholder="••••••••"
                                 className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#2C8DE0] focus:border-transparent transition-all"
                                 type="password"
-                                {...register("password", { required: "Password là bắt buộc" })}
+                                {...register("password")}
                             />
                             {errors.password && <span className="error">{errors.password.message as string}</span>}
                         </div>
 
                         <button
-                            onClick={handleSubmit(handleLogin)}
+                            type="submit"
+                            disabled={isLoggingIn}
                             className="w-full bg-[#2C8DE0] hover:bg-[#1a6fb8] text-white font-bold py-3 rounded-xl shadow-lg transform transition active:scale-95 mt-2"
 
                         >
                             {isLoggingIn ? "Đang chuyển trang" : "Đăng nhập"}
                         </button>
-                    </div>
-
+                    </form>
+                    {/* Chuyển hướng */}
                     <div className="mt-6 text-center">
                         <button
                             onClick={() => navigate("/")}
@@ -88,6 +118,6 @@ export default function Login() {
                 </div>
             </div>
             <Footer />
-        </div>
+        </>
     );
 }

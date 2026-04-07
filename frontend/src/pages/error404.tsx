@@ -1,3 +1,4 @@
+//lib
 import { useNavigate } from "react-router-dom";
 
 export default function NotFound() {
@@ -12,7 +13,7 @@ export default function NotFound() {
                 </div>
 
                 <p className="text-gray-600 mt-8 mb-8 text-lg">
-                    Có vẻ như bạn đã đi lạc đường. Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.
+                    Có vẻ như bạn tàu của bạn đã đi lạc hướng. Trang bạn đang tìm kiếm không có cá hoặc cá đã di cư  đã bị di chuyển.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">

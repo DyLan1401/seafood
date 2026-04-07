@@ -1,24 +1,25 @@
+
+//lib
+import { useNavigate } from "react-router-dom";
 import { HiUserCircle, HiOutlineShoppingCart, HiMenu } from "react-icons/hi";
 import { HiMiniHandThumbUp, HiMiniArrowPath, HiCube, HiMiniTruck } from "react-icons/hi2";
 import { GiFishSmoking } from "react-icons/gi";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+
+//zustand
 import { useCartStore } from "../store/cartStore";
 import { useAuthStore } from "../store/authStore";
-import { useNavigate } from "react-router-dom";
 
 export default function Header() {
-    //
+
     const navigate = useNavigate();
-    //
     const [activeMenu, setActiveMenu] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
-
-    //
     const { isAuth, user, logout } = useAuthStore();
 
     //
-    const toggleMenu = (menuName) => {
+    const toggleMenu = (menuName: string) => {
         setActiveMenu(activeMenu === menuName ? "" : menuName);
     }
 
@@ -52,7 +53,7 @@ export default function Header() {
                     </div>
                 </div>
 
-                {/* 2.  */}
+                {/* */}
                 <div className="w-full py-4 md:h-32 flex justify-around items-center bg-[#2C8DE0] px-2 gap-2">
                     <Link to="/" className="shrink-0">
                         <GiFishSmoking className="w-10 h-10 md:w-14 md:h-14 text-red-600" />

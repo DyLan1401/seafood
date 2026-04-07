@@ -2,6 +2,7 @@ import pool from "../utils/db.js";
 
 let productsCache = {};
 //
+//danh sách sản phẩm
 export const getAllProducts = async ({ page = 1, limit = 10, search = "", category = "" }) => {
 
   const cacheKey = `products_p${page}_l${limit}_s${search}_c${category}`;
@@ -9,7 +10,6 @@ export const getAllProducts = async ({ page = 1, limit = 10, search = "", catego
 
   // BƯỚC 1: Kiểm tra xem trong túi có chưa?
   if (productsCache[cacheKey]) {
-    console.log("⚡ Lấy dữ liệu từ Backend Cache");
     return productsCache[cacheKey];
   }
 
@@ -59,7 +59,7 @@ export const getAllProducts = async ({ page = 1, limit = 10, search = "", catego
   return result;
 };
 
-//
+//chi tiết sản phẩm
 export const getProductDetail = async ({ id }) => {
   const [rows] = await pool.query(
     `
@@ -88,7 +88,7 @@ export const getProductsByCategory = async ({ slug }) => {
   return rows;
 };
 
-
+//thêm sản phẩm
 export const addProduct = async ({ name, slug, price, sale_price, stock, image_url, description, origin, weight, category_id }) => {
   const [rows] = await pool.query(
     `INSERT INTO products(name,slug,price,sale_price,stock,image_url,description,origin,weight,category_id,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,NOW())`
@@ -97,6 +97,7 @@ export const addProduct = async ({ name, slug, price, sale_price, stock, image_u
   return rows;
 };
 
+//cập nhật sản phẩm
 export const updateProduct = async ({ id, name, slug, price, sale_price, stock, image_url, description, origin, weight, category_id }) => {
   const [rows] = await pool.query(
     `UPDATE products SET
@@ -116,15 +117,16 @@ export const updateProduct = async ({ id, name, slug, price, sale_price, stock, 
     , [name, slug, price, sale_price, stock, image_url, description, origin, weight, category_id, id]
   );
   return rows;
-}
+};
 
+//xóa sản phẩm
 export const deleteProduct = async ({ id }) => {
   const [rows] = await pool.query
     (`DELETE FROM products WHERE id = ?`,
       [id]
     )
   return rows;
-}
+};
 
 
 

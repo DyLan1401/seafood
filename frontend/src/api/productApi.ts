@@ -16,9 +16,14 @@ export const fetchDeleteproduct = async (id: string) => {
     return data;
 }
 
+export const fetchProductByCategory = async (slug: string) => {
+    const { data } = await api.get(`/product/category/${slug}`)
+    return data;
+}
+
 
 export const fetchProductDetail = async (id: string) => {
-    const { data } = await api.delete(`/product/${id}`)
+    const { data } = await api.get(`/product/${id}`)
     return data;
 }
 

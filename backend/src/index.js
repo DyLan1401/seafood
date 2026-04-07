@@ -11,7 +11,7 @@ import categoryRoutes from "./routes/categoryRoute.js"
 import orderRoutes from "./routes/orderRoutes.js"
 import authRoute from "./routes/authRoute.js"
 
-//
+//cho phép url truy cập
 const app = express();
 app.use(cors({
     origin: [
@@ -34,6 +34,7 @@ app.use("/api/order", orderRoutes);
 app.use("/api/user", authRoute);
 
 
+//test api
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 });

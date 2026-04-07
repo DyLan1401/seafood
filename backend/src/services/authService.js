@@ -1,30 +1,34 @@
 import pool from "../utils/db.js";
 
 
+
+//danh sách người dùng
 export const userList = async () => {
     const [rows] = await pool.query(
         `SELECT *  from users ORDER BY id DESC`
     )
     return rows;
-}
+};
 
+//chi tiết người dùng
 export const userDetail = async ({ id }) => {
-
     const [rows] = await pool.query(
         `SELECT *  from users where id = ?`
         , [id]
     )
     return rows[0];
-}
+};
 
+//xóa người dùng
 export const deleteUser = async ({ id }) => {
     const [rows] = await pool.query(
         `DELETE from users where id = ?`
         , [id]
     );
     return rows;
-}
+};
 
+//cập nhật người dùng
 export const updateUser = async ({ id, email, password, role }) => {
     const [rows] = await pool.query(
         `UPDATE user SET 
@@ -37,8 +41,7 @@ export const updateUser = async ({ id, email, password, role }) => {
         , [id, email, password, role]
     );
     return rows;
-}
-
+};
 
 //tìm email trong bẳng users
 export const findUserByEmail = async (email) => {
@@ -56,4 +59,4 @@ export const register = async ({ email, password }) => {
         [email, password]
     );
     return result;
-}
+};

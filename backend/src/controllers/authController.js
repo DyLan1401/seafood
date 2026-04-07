@@ -2,6 +2,7 @@ import * as authService from '../services/authService.js';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+//danh sách người dùng
 export const userList = async (req, res) => {
     try {
 
@@ -21,6 +22,7 @@ export const userList = async (req, res) => {
     }
 }
 
+//chi tiết người dùng
 export const userDetail = async (req, res) => {
     try {
         const { id } = req.params;
@@ -41,6 +43,7 @@ export const userDetail = async (req, res) => {
     }
 }
 
+//xóa người dùng
 export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -61,6 +64,7 @@ export const deleteUser = async (req, res) => {
     }
 }
 
+//chỉnh sửa người dùng
 export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -91,13 +95,10 @@ export const Login = async (req, res) => {
         const { email, password } = req.body;
         const user = await authService.findUserByEmail(email);
 
-        // 1. Phải check tồn tại TRƯỚC khi log hoặc so sánh pass
         if (!user) {
             return res.status(401).json({ error: "Tài khoản không tồn tại" });
         }
 
-        // 2. Bây giờ admin đã chắc chắn tồn tại, mới log được
-        console.log("Mật khẩu từ DB:", user.password);
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
@@ -123,8 +124,6 @@ export const Login = async (req, res) => {
         });
     }
 };
-
-
 
 //đăng kí
 export const Register = async (req, res) => {
@@ -156,7 +155,9 @@ export const Register = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Register Error:", error);
-        return res.status(500).json({ message: "Lỗi hệ thống khi đăng ký" });
+        res.status(500).json({
+            message: "Đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
     }
 };

@@ -1,3 +1,4 @@
+
 type Product = {
     image_url: string | null
     name: string
@@ -13,7 +14,7 @@ export default function ProductCard({ image_url, name, sale_price, price }: Prod
             {/* */}
             <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gray-50 shrink-0">
                 {image_url ? (
-                    <img className="object-cover w-full h-full" src={image_url} alt={name} />
+                    <img loading="lazy" className="object-cover w-full h-full" src={image_url} alt={name} />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-200 text-xs">No Image</div>
                 )}

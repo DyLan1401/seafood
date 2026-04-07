@@ -1,21 +1,42 @@
+//lib
+import { Link, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
+
+//components
 import Footer from "../component/Footer";
 import Header from "../component/Header";
 import ProductCard from "../component/ProductCard";
-import { Link } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
+
+//hooks
 import { useProduct } from "../hooks/useProducts";
+
+//types
 import type { Product } from "../types/product";
+
+
 export default function Products() {
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const searchQuery = (searchParams.get("search") || "").toLowerCase();
     const { products, isErrorProducts, isLoadingProducts } = useProduct();
 
 
-    const filtredProducts = products?.filter((p: Product) =>
-        p.name.toLowerCase().includes(searchQuery))
+    const productList = products?.items || [];
+    // const productList = useMemo(() => {
+    //     return products?.items || [];
+    // }, [products]);
+
+    //tìm kiếm
+    const filteredProducts = useMemo(() => {
+        return productList.filter((p: Product) =>
+            p.name.toLowerCase().includes(searchQuery)
+        );
+
+    }, [productList, searchQuery])
 
     if (isLoadingProducts) return (
-        <div className="flex justify-center items-center min-h-[400px] font-medium text-gray-500">
+        <div className="flex justify-center items-center min-h-100 font-medium text-gray-500">
             Đang tải sản phẩm...
         </div>
     );
@@ -28,22 +49,22 @@ export default function Products() {
 
     return (
         /**/
-        <div className="container mx-auto px-2 sm:px-4">
+        <>
             <Header />
-            <main className="w-full h-full py-4 md:py-6">
-                {/*  */}
+            {/* Main */}
+            <main className="container mx-auto py-4 md:py-6">
                 <div className="text-lg md:text-xl rounded-t-lg bg-[#BF4E2C] p-3 md:p-4 font-semibold text-white text-start uppercase">
                     {searchQuery ? `Kết quả tìm kiếm: "${searchQuery}"` : "Tất cả sản phẩm"}
                 </div>
 
-                {/*  */}
+                {/* hiển thị sản phẩm */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-6 p-2 md:p-4 bg-[#FFF2E8] rounded-b-lg border-x border-b border-[#e5e7eb]">
-                    {filtredProducts && filtredProducts.length > 0 ? (
-                        filtredProducts.map((p: Product) => (
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map((p: Product) => (
                             <Link
                                 key={p.id}
-                                to={`/product/${p.slug}`}
-                                className="w-full flex justify-center hover:scale-[1.02] transition-transform"
+                                to={`/product/${p.id}`}
+                                className="w-full  flex justify-center hover:scale-[1.02] transition-transform"
                             >
                                 <ProductCard
                                     name={p.name}
@@ -55,13 +76,18 @@ export default function Products() {
                         ))
                     ) : (
                         <div className="col-span-full py-20 text-center text-gray-500 italic">
-                            Không tìm thấy sản phẩm nào phù hợp.
+                            Cá hiện tại đang phơi nắng  mời bạn quay lại sau.
+                            <button
+                                onClick={() => navigate('/products')}
+                                className="text-[#BF4E2C] underline font-medium"
+                            >
+                                Xem tất cả sản phẩm
+                            </button>
                         </div>
                     )}
                 </div>
             </main>
-
             <Footer />
-        </div>
+        </>
     )
 }
