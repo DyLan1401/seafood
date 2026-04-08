@@ -35,7 +35,6 @@ export const updateUser = async ({ id, email, password, role }) => {
         email = ?,
         password = ?,
         role = ?,
-        created_at = NOW()
         where id = ?
         `
         , [id, email, password, role]

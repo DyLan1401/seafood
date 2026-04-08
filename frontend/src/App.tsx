@@ -11,15 +11,22 @@ import CategoryDetail from './pages/CategoryDetail'
 import Categories from './pages/Categories'
 import UserOrders from './pages/UserOrders'
 import Error404 from './pages/error404'
-import Dashboard from './pages/Dashboard'
+import DashboardOverview from './pages/admin/DashboardOverview'
 import { ToastContainer } from './component/ToastContainer'
 import OrderDetail from './pages/OrderDetail'
+
+import AdminLayout from './component/admin/adminLayout'
+import AdminProducts from './pages/admin/AdminProduct'
+import AdminOrders from './pages/admin/AdminOrders'
+import AdminCategories from './pages/admin/AdminCategories'
+import AdminUsers from './pages/admin/AdminUsers'
 
 function App() {
 
   return (
     <>
       <Routes>
+        {/* User */}
         <Route path='/' element={<Home />} />
         <Route path='/products' element={<Products />} />
         <Route path="/product/:id" element={<ProductDetail />} />
@@ -30,11 +37,22 @@ function App() {
         <Route path="/product/category/:slug" element={<CategoryDetail />} />
         <Route path='/categories' element={<Categories />} />
         <Route path='/my-orders' element={<UserOrders />} />
-        <Route path='/dashboard' element={<Dashboard />} />
         <Route path="/order/:id" element={<OrderDetail />} />
 
+        {/* Admin */}
+        <Route path="/admin" element={<AdminLayout />} >
+
+          <Route index element={<DashboardOverview />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="users" element={<AdminUsers />} />
+        </Route >
+
         <Route path="*" element={<Error404 />} />
+
       </Routes>
+
       <ToastContainer />
     </>
   )

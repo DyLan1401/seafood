@@ -10,8 +10,9 @@ router.get('/my-orders', verifyToken, getMyOrders);
 //router action
 router.post("/create", verifyToken, createOrder);
 router.delete("/delete/:id", deleteOrder);
-router.put("/:id/status", updateOrder);
 
+
+router.put("/:id/status", updateOrder);
 //
 router.get("/:id", getOrderDetail);
 export default router;      

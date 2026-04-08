@@ -1,4 +1,5 @@
 import api from "../api/axios"
+import type { User } from "../types/user";
 
 
 export const fetchUserList = async () => {
@@ -17,9 +18,9 @@ export const fetchRegister = async (email: string, password: string) => {
     return data;
 }
 
-export const fetchUpdateUser = async (id: string) => {
-    const { data } = await api.put(`/user/update/${id}`)
-    return data;
+export const fetchUpdateUser = async ({ id, ...data }: User) => {
+    const response = await api.put(`/user/update/${id}`, data);
+    return response.data;
 }
 
 export const fetchDeleteUser = async (id: string) => {

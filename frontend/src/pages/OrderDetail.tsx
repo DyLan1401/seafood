@@ -24,6 +24,26 @@ export default function OrderDetail() {
     const order = data?.order;
     const items = data?.items ?? [];
 
+
+
+    const STATUSES = ["pending", "confirmed", "shipping", "done", "canceled"];
+
+    const STATUS_LABEL: Record<string, string> = {
+        pending: "Chờ xác nhận",
+        confirmed: "Đã xác nhận",
+        shipping: "Đang giao",
+        done: "Đã giao",
+        canceled: "Đã hủy",
+    };
+
+    const STATUS_COLOR: Record<string, string> = {
+        pending: "bg-yellow-100 text-yellow-700",
+        confirmed: "bg-blue-100 text-blue-700",
+        shipping: "bg-purple-100 text-purple-700",
+        done: "bg-green-100 text-green-700",
+        canceled: "bg-red-100 text-red-700",
+    };
+
     // Loading
     if (isLoadingDetail) return (
         <>
@@ -79,8 +99,7 @@ export default function OrderDetail() {
                             <p className="text-xs text-gray-400 mt-0.5">{(order.created_at)}</p>
                         </div>
                         <div className="text-center">
-                            <div>Trạng thái đơn hàng</div>
-                            <div>{order.status}</div>
+                            <div className={`${STATUS_COLOR[order.status]} p-2  rounded-lg`}>{STATUS_LABEL[order.status]}</div>
                         </div>
                     </div>
 

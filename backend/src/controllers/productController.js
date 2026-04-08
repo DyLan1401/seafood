@@ -1,6 +1,5 @@
 import * as productService from '../services/productService.js';
-
-//lấy tất cả sản phẩm
+const cloudinary = require('../config/cloudinary');//lấy tất cả sản phẩm
 export const getProducts = async (req, res) => {
     try {
         //
@@ -74,7 +73,7 @@ export const createProduct = async (req, res) => {
 
         const data = await productService.addProduct({ name, slug, price, sale_price, stock, image_url, description, origin, weight, category_id });
 
-        if (!data.affectedRows === 0) {
+        if (data.affectedRows === 0) {
             return res.status(404).json({
                 message: "Không thể thêm sản phẩm",
             });
@@ -100,7 +99,7 @@ export const updateProduct = async (req, res) => {
 
         const data = await productService.updateProduct({ id, name, slug, price, sale_price, stock, image_url, description, origin, weight, category_id });
 
-        if (!data) {
+        if (data) {
             return res.status(404).json({
                 message: `Không thể cập nhật sản phẩm id: ${id} `,
             });
@@ -139,5 +138,25 @@ export const deleteProduct = async (req, res) => {
             message: "Đã xảy ra lỗi hệ thống",
             error: error.message
         })
+    }
+}
+
+export const uploadFile = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'Không có file nào được chọn' });
+        }
+
+        // Tải file lên Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'seefood_products', // Thư mục lưu ảnh trên Cloudinary
+        });
+
+        // Trả về URL thật của ảnh
+        res.status(200).json({
+            imageUrl: result.secure_url
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Lỗi upload ảnh', error: error.message });
     }
 }

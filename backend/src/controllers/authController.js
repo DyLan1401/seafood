@@ -70,10 +70,10 @@ export const updateUser = async (req, res) => {
         const { id } = req.params;
         const { email, password, role } = req.body;
 
-        const data = await authService.userList();
+        const data = await authService.updateUser({ id, email, password, role });
 
         if (!data) {
-            return res.status(401).json({ error: "không tìm thấy user có id:" + { email, password, role, id } });
+            return res.status(401).json({ error: "không tìm thấy user có id:" + { id } });
         }
 
 

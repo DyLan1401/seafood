@@ -1,4 +1,5 @@
 import * as categoryService from '../services/categoryService.js';
+const cloudinary = require('../config/cloudinary');//lấy tất cả sản phẩm
 
 //lấy tất cả danh mục
 export const getAllCategory = async (req, res) => {
@@ -105,5 +106,25 @@ export const DeleteCategory = async (req, res) => {
             message: "Đã xảy ra lỗi hệ thống",
             error: error.message
         })
+    }
+}
+
+export const uploadFile = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'Không có file nào được chọn' });
+        }
+
+        // Tải file lên Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'seefood_categories', // Thư mục lưu ảnh trên Cloudinary
+        });
+
+        // Trả về URL thật của ảnh
+        res.status(200).json({
+            imageUrl: result.secure_url
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Lỗi upload ảnh', error: error.message });
     }
 }

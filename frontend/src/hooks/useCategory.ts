@@ -16,12 +16,19 @@ export const useCategory = (id?: string) => {
         staleTime: 10 * 60 * 1000
     });
 
+    // Thêm Create Mutation
+    const createMutation = useMutation({
+        mutationFn: api.fetchCreateCategory,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["categories"] });
+        }
+    });
+
     const updateMutation = useMutation({
+        // API này nhận object { id, productData }
         mutationFn: api.fetchUpdateCategory,
         onSuccess: () => {
-
             queryClient.invalidateQueries({ queryKey: ["categories"] });
-
             if (id) queryClient.invalidateQueries({ queryKey: ["categories", "detail", id] });
         }
     });
@@ -31,6 +38,9 @@ export const useCategory = (id?: string) => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["categories"] });
         }
+    });
+    const uploadMutation = useMutation({
+        mutationFn: api.uploadCategoryImage,
     });
 
 
@@ -43,8 +53,10 @@ export const useCategory = (id?: string) => {
         // Trạng thái loading
         isLoadingCategory: listQuery.isLoading,
         isLoadingDetail: detailQuery.isLoading,
+        isCreating: createMutation.isPending,
         isUpdating: updateMutation.isPending,
         isDeleting: deleteMutation.isPending,
+        isUploading: uploadMutation.isPending,
 
         //Trạng thái lỗi
         isErrorCategory: listQuery.isError,
@@ -52,6 +64,8 @@ export const useCategory = (id?: string) => {
 
 
         // Hành động (Actions)
+        uploadImage: uploadMutation.mutateAsync, // Dùng mutateAsync để đợi lấy URL
+        createCategory: createMutation.mutate,
         updateCategory: updateMutation.mutate,
         deleteCategory: deleteMutation.mutate
     };

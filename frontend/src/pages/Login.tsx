@@ -46,7 +46,7 @@ export default function Login() {
 
                 //kiểm tra chuyển hướng
                 if (userRole === "admin") {
-                    navigate("/dashboard")
+                    navigate("/admin")
                 } else {
                     navigate("/");
                 }

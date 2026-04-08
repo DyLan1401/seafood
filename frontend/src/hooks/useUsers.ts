@@ -44,9 +44,7 @@ export const useUsers = (userId?: string) => {
             // Xóa sạch cache cũ để đảm bảo người dùng mới không thấy data của người cũ
             queryClient.clear();
         },
-        onError: (error) => {
-            console.error('Lỗi đăng nhập:', error.message);
-        }
+
     });
 
     // 5. CẬP NHẬT
@@ -54,9 +52,7 @@ export const useUsers = (userId?: string) => {
         mutationFn: api.fetchUpdateUser,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["users"] });
-            // Nếu đang xem chi tiết, làm mới luôn cả detail của user đó
-            if (userId) queryClient.invalidateQueries({ queryKey: ["users", "detail", userId] });
-        }
+        },
     });
 
     const deleteMutation = useMutation({

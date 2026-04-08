@@ -1,5 +1,5 @@
 export interface Product {
-    id: number;
+    id?: string;
     category_id: number;
     name: string;
     slug: string;
@@ -7,6 +7,8 @@ export interface Product {
     price: number;
     sale_price: number | null;
     stock: number;
-    image_url: string | null;
-    created_at: string;
-};
+    image_url: string;
+    origin?: string;
+    weight?: string;
+    created_at?: string;
+}

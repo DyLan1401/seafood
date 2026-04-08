@@ -7,6 +7,7 @@ export interface Order {
     total: number;
     status: string;
     created_at: string;
+    total_price: number | null;
 }
 
 
@@ -35,6 +36,9 @@ export interface OrderDetailData {
 
 
 
+
+
+
 //sản phẩm trong đơn hàng
 export interface OrderItem {
     productId: string | number;
@@ -57,3 +61,5 @@ export interface CheckoutFormData {
     address: string;
     note?: string;
 }
+
+

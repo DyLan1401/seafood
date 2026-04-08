@@ -27,7 +27,7 @@ export const fetchUSerOrder = async () => {
 }
 
 export const fetchDeleteOrder = async (id: string) => {
-    const { data } = await api.delete(`/order/${id}`);
+    const { data } = await api.delete(`/order/delete/${id}`);
     return data;
 };
 
