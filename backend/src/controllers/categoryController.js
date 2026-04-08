@@ -1,5 +1,5 @@
 import * as categoryService from '../services/categoryService.js';
-import cloudinary from '../config/cloudinary';
+import cloudinary from '../config/cloudinary.js';
 
 //lấy tất cả danh mục
 export const getAllCategory = async (req, res) => {

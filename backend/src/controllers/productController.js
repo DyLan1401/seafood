@@ -1,5 +1,6 @@
 import * as productService from '../services/productService.js';
-import cloudinary from '../config/cloudinary';
+import cloudinary from '../config/cloudinary.js';
+
 //lấy tất cả sản phẩm
 export const getProducts = async (req, res) => {
     try {
