@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getProducts, getProductDetail, getProductsByCategory, createProduct, updateProduct, deleteProduct, uploadFile } from '../controllers/productController.js';
-const multer = require('multer');
+import multer from 'multer';
 //
 const router = Router();
 const upload = multer({ dest: 'uploads/' });

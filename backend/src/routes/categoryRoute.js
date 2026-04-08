@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { getAllCategory, getCategoryDetail, AddCategory, UpdateCategory, DeleteCategory } from '../controllers/categoryController.js';
-const multer = require('multer');
+import { getAllCategory, getCategoryDetail, AddCategory, UpdateCategory, DeleteCategory, uploadFile } from '../controllers/categoryController.js';
+import multer from 'multer';
 //
 const router = Router();
 const upload = multer({ dest: 'uploads/' });
