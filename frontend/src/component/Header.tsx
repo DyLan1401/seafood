@@ -97,7 +97,7 @@ export default function Header() {
                                                 <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100 italic">
                                                     {user?.email}
                                                 </div>
-                                                <Link to="/my-orders" className="block px-4 py-2 text-sm hover:bg-red-50 transition" onClick={() => setActiveMenu("")}>Đơn hàng của tôi</Link>
+                                                <Link to="/my-order" className="block px-4 py-2 text-sm hover:bg-red-50 transition" onClick={() => setActiveMenu("")}>Đơn hàng của tôi</Link>
                                                 <button onClick={() => { logout(); setActiveMenu(""); }} className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Đăng xuất</button>
                                             </>
                                         ) : (
