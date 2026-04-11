@@ -43,10 +43,10 @@ function App() {
         <Route path="/admin" element={<AdminLayout />} >
 
           <Route index element={<DashboardOverview />} />
-          <Route path="/products" element={<AdminProducts />} />
-          <Route path="/orders" element={<AdminOrders />} />
-          <Route path="/categories" element={<AdminCategories />} />
-          <Route path="/users" element={<AdminUsers />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="users" element={<AdminUsers />} />
         </Route >
 
         <Route path="*" element={<Error404 />} />
