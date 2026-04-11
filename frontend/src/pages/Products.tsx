@@ -30,7 +30,7 @@ export default function Products() {
     //tìm kiếm
     const filteredProducts = useMemo(() => {
         return productList.filter((p: Product) =>
-            p.name.toLowerCase().includes(searchQuery)
+            p.name?.toLowerCase().includes(searchQuery)
         );
 
     }, [productList, searchQuery])
@@ -63,10 +63,11 @@ export default function Products() {
                         filteredProducts.map((p: Product) => (
                             <Link
                                 key={p.id}
-                                to={`/product/${p.slug}`}
+                                to={`/product/${p.id}`}
                                 className="w-full  flex justify-center hover:scale-[1.02] transition-transform"
                             >
                                 <ProductCard
+                                    id={p.id}
                                     name={p.name}
                                     image_url={p.image_url}
                                     price={p.price}
