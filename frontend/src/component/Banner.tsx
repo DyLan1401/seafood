@@ -1,5 +1,5 @@
 import Banner1 from "../assets/banner1.jfif";
-import Banner2 from "../assets/Banner2.jpg";
+import Banner2 from "../assets/banner2.jpg";
 import Banner3 from "../assets/banner3.jpg";
 
 export default function Banner() {
