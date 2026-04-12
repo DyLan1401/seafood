@@ -2,6 +2,9 @@ import pool from "../utils/db.js";
 
 let productsCache = {};
 
+export const clearProductsCache = () => {
+  productsCache = {};
+};
 //danh sách sản phẩm
 export const getAllProducts = async ({ page = 1, limit = 10, search = "", category = "" }) => {
 
@@ -85,6 +88,7 @@ export const getProductsByCategory = async ({ slug }) => {
              WHERE c.slug = ?`,
     [slug]
   );
+
   return rows;
 };
 
@@ -94,6 +98,7 @@ export const addProduct = async ({ name, slug, price, sale_price, stock, image_u
     `INSERT INTO products(name,slug,price,sale_price,stock,image_url,description,origin,weight,category_id,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,NOW())`
     , [name, slug, price, sale_price, stock, image_url, description, origin, weight, category_id]
   );
+  clearProductsCache();
   return rows;
 };
 
@@ -116,6 +121,7 @@ export const updateProduct = async ({ id, name, slug, price, sale_price, stock, 
     `
     , [name, slug, price, sale_price, stock, image_url, description, origin, weight, category_id, id]
   );
+  clearProductsCache();
   return rows;
 };
 
@@ -124,7 +130,8 @@ export const deleteProduct = async ({ id }) => {
   const [rows] = await pool.query
     (`DELETE FROM products WHERE id = ?`,
       [id]
-    )
+    );
+  clearProductsCache();
   return rows;
 };
 

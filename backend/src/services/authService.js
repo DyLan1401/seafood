@@ -2,6 +2,10 @@ import pool from "../utils/db.js";
 
 let usersCache = {};
 
+export const clearUsersCache = () => {
+    usersCache = {};
+};
+
 //danh sách người dùng
 export const userList = async ({ page = 1, limit = 5 }) => {
     const cacheKey = `users_p${page}_l${limit}`;
@@ -58,20 +62,22 @@ export const deleteUser = async ({ id }) => {
         `DELETE from users where id = ?`
         , [id]
     );
+    clearUsersCache();
     return rows;
 };
 
 //cập nhật người dùng
 export const updateUser = async ({ id, email, password, role }) => {
     const [rows] = await pool.query(
-        `UPDATE user SET 
+        `UPDATE users SET 
         email = ?,
         password = ?,
         role = ?,
-        where id = ?
+        WHERE id = ?
         `
-        , [id, email, password, role]
+        , [email, password, role, id]
     );
+    clearUsersCache();
     return rows;
 };
 
@@ -81,6 +87,7 @@ export const findUserByEmail = async (email) => {
         `SELECT id, email, password ,role FROM users WHERE email = ? LIMIT 1`,
         [email]
     );
+
     return rows[0];
 };
 
@@ -90,5 +97,6 @@ export const register = async ({ email, password }) => {
         `INSERT INTO users (email, password) VALUES (?, ?)`,
         [email, password]
     );
+    clearUsersCache();
     return result;
 };

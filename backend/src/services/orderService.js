@@ -1,6 +1,10 @@
 import pool from "../utils/db.js";
 
 let ordersCache = {};
+
+export const clearOrdersCache = () => {
+    ordersCache = {};
+};
 //lấy đơn hàng
 export const getOrders = async ({ page = 1, limit = 5 }) => {
     const cacheKey = `order_p${page}_l${limit}`;
@@ -83,6 +87,7 @@ export const addOrder = async ({ userId, customerName, phone, address, note = ""
         //
         await conn.commit();
         //
+        clearOrdersCache();
         return { id: orderId, total, status: "pending" }; // Trả về data thuần
     } catch (error) {
         await conn.rollback(); // Nếu lỗi thì hoàn tác
@@ -99,7 +104,7 @@ export const getOrderDetail = async ({ id }) => {
     );
     //
     if (orders.length === 0) {
-        return res.status(404).json({ error: "không tìm thấy đơn hàng" });
+        throw new Error("Không tìm thấy đơn hàng");
     }
     //
     const [items] = await pool.query(
@@ -118,17 +123,19 @@ export const updateOrder = async ({ id, status }) => {
     const allowed = ["pending", "confirmed", "shipping", "done", "canceled"];
     //
     if (!allowed.includes(status)) {
-        return res.status(404).json({ error: "không tìm thấy status" });
+        throw new Error("Trạng thái không hợp lệ");
     }
+
     //
     const [reuslt] = await pool.query(
         "UPDATE orders SET status = ? WHERE id = ?", [status, id]
     );
-    //
+
     if (reuslt.affectedRows === 0) {
-        return res.status(404).json({ error: "không tìm thấy đơn hàng" });
+        throw new Error("Không tìm thấy đơn hàng");
     }
     //
+    clearOrdersCache();
     return reuslt;
 };
 
@@ -147,5 +154,35 @@ export const deleteOrder = async ({ id }) => {
         (`DELETE FROM orders where id = ?`
             , [id]
         )
+    clearOrdersCache();
     return rows;
+};
+
+
+// Thêm hàm mới cuối file
+export const getOrderStats = async () => {
+    // Tổng số đơn
+    const [[{ totalOrders }]] = await pool.query(
+        `SELECT COUNT(*) as totalOrders FROM orders`
+    );
+
+    // Doanh thu từ đơn done
+    const [[{ totalRevenue }]] = await pool.query(
+        `SELECT COALESCE(SUM(total), 0) as totalRevenue 
+         FROM orders WHERE status = 'done'`
+    );
+
+    // Doanh thu theo từng ngày trong 7 ngày gần nhất
+    const [dailyRevenue] = await pool.query(
+        `SELECT 
+            DATE(created_at) as date,
+            COALESCE(SUM(total), 0) as revenue
+         FROM orders
+         WHERE status = 'done'
+           AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+         GROUP BY DATE(created_at)
+         ORDER BY date ASC`
+    );
+
+    return { totalOrders, totalRevenue, dailyRevenue };
 };

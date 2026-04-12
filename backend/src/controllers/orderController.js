@@ -71,7 +71,7 @@ export const updateOrder = async (req, res) => {
         const { status } = req.body;
         //
         const data = await orderService.updateOrder({ id, status });
-        //Kiểm tra nếu không có dữ liệu trả về
+
         if (!data) {
             return res.status(404).json({ message: "Không tìm thấy đơn hàng để cập nhật" });
         }
@@ -87,9 +87,7 @@ export const updateOrder = async (req, res) => {
 //lịch sử đơn hàng
 export const getMyOrders = async (req, res) => {
     try {
-        console.log("req.user:", req.user); // xem object có gì
         const userId = req.user?.id;
-        console.log("userId:", userId);
 
         if (!userId) {
             return res.status(401).json({ message: "Không tìm thấy thông tin người dùng" });
@@ -120,6 +118,20 @@ export const deleteOrder = async (req, res) => {
         //
         res.status(200).json(data);
         //
+    } catch (error) {
+        res.status(500).json({
+            message: "Đã xảy ra lỗi hệ thống",
+            error: error.message
+        })
+    }
+};
+
+export const getStats = async (req, res) => {
+    try {
+
+        const data = await orderService.getOrderStats();
+
+        res.status(200).json(data);
     } catch (error) {
         res.status(500).json({
             message: "Đã xảy ra lỗi hệ thống",

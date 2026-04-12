@@ -9,44 +9,50 @@ import { ShoppingBag, Users, Layers, DollarSign, TrendingUp, Loader2 } from 'luc
 import { useProductList } from '../../hooks/product/useProductList';
 import { useUserList } from '../../hooks/user/useUserList';
 import { useOrderList } from '../../hooks/order/useOrderList';
-import type { Order } from "../../types/order"
+import { useOrderStats } from '../../hooks/order/useOrderStats';
 
 
 export default function DashboardOverview() {
 
     const { products = [], pagination: paginationProducts, isLoading: isLoadingProduct } = useProductList();
     const { users = [], pagination: paginationUsers, isLoading: isLoadingUser } = useUserList();
-    const { orders = [], pagination: paginationOrders, isLoading: isLoadingOrder } = useOrderList();
+    const { pagination: paginationOrders, isLoading: isLoadingOrder } = useOrderList();
+    const { stats: orderStats, isLoading: isLoadingStats } = useOrderStats();
 
-    const isLoading = isLoadingProduct || isLoadingUser || isLoadingOrder;
+    const isLoading = isLoadingProduct || isLoadingUser || isLoadingOrder || isLoadingStats;
 
 
 
 
-    // 2. Tính toán 
-    const stats = useMemo(() => {
-        const totalRevenue = orders
-            .filter((o: Order) => o.status === 'đã giao' || o.status === 'done')
-            .reduce((sum: number, order: Order) => {
+    const stats = useMemo(() => ({
+        revenue: new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
+        }).format(orderStats?.totalRevenue ?? 0),
+        ordersCount: orderStats?.totalOrders ?? paginationOrders?.totalItems ?? 0,
+        productsCount: paginationProducts?.totalItems ?? products.length,
+        usersCount: paginationUsers?.totalItems ?? users.length,
+    }), [orderStats, paginationOrders, paginationProducts, paginationUsers, products, users]);
 
-                return sum + (Number(order.total) || 0);
-            }, 0);
 
-        return {
-            revenue: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalRevenue),
-            ordersCount: paginationOrders?.totalItems ?? orders.length,
-            productsCount: paginationProducts?.totalItems ?? products.length,
-            usersCount: paginationUsers?.totalItems ?? users.length,
-        }
-            ;
-    }, [orders, products, users, paginationOrders, paginationProducts, paginationUsers]);
+    // Chuyển dailyRevenue từ API thành format cho Recharts
+    const revenueData = useMemo(() => {
+        if (!orderStats?.dailyRevenue?.length) return [];
 
-    const revenueData = [
-        { name: 'T2', revenue: 2400 }, { name: 'T3', revenue: 1398 },
-        { name: 'T4', revenue: 9800 }, { name: 'T5', revenue: 3908 },
-        { name: 'T6', revenue: 4800 }, { name: 'T7', revenue: 3800 },
-        { name: 'CN', revenue: 4300 },
-    ];
+        return orderStats.dailyRevenue.map((d: { date: string; revenue: number }) => ({
+            name: new Date(d.date).toLocaleDateString("vi-VN", {
+                weekday: "short",  // T2, T3...
+            }),
+            revenue: d.revenue,
+        }));
+    }, [orderStats]);
+
+    // const revenueData = [
+    //     { name: 'T2', revenue: 2400 }, { name: 'T3', revenue: 1398 },
+    //     { name: 'T4', revenue: 9800 }, { name: 'T5', revenue: 3908 },
+    //     { name: 'T6', revenue: 4800 }, { name: 'T7', revenue: 3800 },
+    //     { name: 'CN', revenue: 4300 },
+    // ];
 
     if (isLoading) {
         return (
@@ -77,7 +83,15 @@ export default function DashboardOverview() {
                 <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
                     <h3 className="text-lg font-bold text-gray-800 mb-6 italic">Doanh thu tuần qua</h3>
                     <div className="h-80 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                        {revenueData.length === 0 ? (
+                            // Empty state khi không có data
+                            <div className="h-full flex flex-col items-center justify-center text-gray-300">
+                                <DollarSign size={48} className="mb-3" />
+                                <p className="text-sm font-medium text-gray-400">
+                                    Chưa có doanh thu trong 7 ngày qua
+                                </p>
+                            </div>
+                        ) : (<ResponsiveContainer width="100%" height="100%">
                             <LineChart data={revenueData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} />
@@ -89,7 +103,7 @@ export default function DashboardOverview() {
                                 />
                                 <Line type="monotone" dataKey="revenue" stroke="#3B82F6" strokeWidth={4} dot={{ r: 6, fill: '#3B82F6', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8 }} />
                             </LineChart>
-                        </ResponsiveContainer>
+                        </ResponsiveContainer>)}
                     </div>
                 </div>
             </div>

@@ -37,3 +37,8 @@ export const fetchDeleteOrder = async (id: string) => {
     return data;
 };
 
+
+export const fetchOrderStats = async () => {
+    const { data } = await api.get("/order/stats");
+    return data;
+};

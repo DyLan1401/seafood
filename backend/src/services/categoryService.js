@@ -2,6 +2,10 @@ import pool from "../utils/db.js";
 
 let categoriesCache = {};
 
+export const clearCategoriesCache = () => {
+  categoriesCache = {};
+};
+
 //lấy danh mục
 export const getCategory = async ({ page = 1, limit = 5 }) => {
   const cacheKey = `categories_p${page}_l${limit}`;
@@ -57,7 +61,8 @@ export const createCategory = async ({ name, slug, image_url }) => {
   const [rows] = await pool.query(
     `INSERT INTO categories (name,slug,image_url,created_at)  VALUES (?,?,?,NOW()) `
     , [name, slug, image_url]
-  )
+  );
+  clearCategoriesCache();
   return rows;
 };
 
@@ -72,6 +77,7 @@ export const UpdateCategory = async ({ id, name, slug, image_url }) => {
     WHERE id = ? `
     , [name, slug, image_url, id]
   );
+  clearCategoriesCache();
   return rows;
 };
 
@@ -81,6 +87,7 @@ export const DeleteCategory = async ({ id }) => {
     `DELETE FROM categories WHERE id = ?`
     , [id]
   );
+  clearCategoriesCache();
   return rows;
 
 };
