@@ -8,7 +8,7 @@ export const getAllCategory = async (req, res) => {
 
         const data = await categoryService.getCategory({
             page: parseInt(page) || 1,
-            limit: parseInt(limit) || 10
+            limit: parseInt(limit) || 5
         });
 
         if (data.affectedRows === 0) {

@@ -9,7 +9,7 @@ export const getAllOrders = async (req, res) => {
 
         const data = await orderService.getOrders({
             page: parseInt(page) || 1,
-            limit: parseInt(limit) || 10
+            limit: parseInt(limit) || 5
         });
 
         //check 

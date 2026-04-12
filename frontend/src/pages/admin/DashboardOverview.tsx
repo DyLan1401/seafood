@@ -14,32 +14,32 @@ import type { Order } from "../../types/order"
 
 export default function DashboardOverview() {
 
-    const { products = [], isLoading: isLoadingProduct } = useProductList();
-    const { users = [], isLoading: isLoadingUser } = useUserList();
-    const { orders = [], isLoading: isLoadingOrder } = useOrderList();
+    const { products = [], pagination: paginationProducts, isLoading: isLoadingProduct } = useProductList();
+    const { users = [], pagination: paginationUsers, isLoading: isLoadingUser } = useUserList();
+    const { orders = [], pagination: paginationOrders, isLoading: isLoadingOrder } = useOrderList();
 
     const isLoading = isLoadingProduct || isLoadingUser || isLoadingOrder;
 
-    const productList = products?.items || [];
 
 
 
     // 2. Tính toán 
     const stats = useMemo(() => {
         const totalRevenue = orders
-            .filter((o: Order) => o.status === 'completed' || o.status === 'delivered')
+            .filter((o: Order) => o.status === 'đã giao' || o.status === 'done')
             .reduce((sum: number, order: Order) => {
 
-                return sum + (Number(order.total_price) || 0);
+                return sum + (Number(order.total) || 0);
             }, 0);
 
         return {
             revenue: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalRevenue),
-            ordersCount: orders.length.toLocaleString(),
-            productsCount: productList.length.toLocaleString(),
-            usersCount: users.length.toLocaleString()
-        };
-    }, [orders, productList, users]);
+            ordersCount: paginationOrders?.totalItems ?? orders.length,
+            productsCount: paginationProducts?.totalItems ?? products.length,
+            usersCount: paginationUsers?.totalItems ?? users.length,
+        }
+            ;
+    }, [orders, products, users, paginationOrders, paginationProducts, paginationUsers]);
 
     const revenueData = [
         { name: 'T2', revenue: 2400 }, { name: 'T3', revenue: 1398 },

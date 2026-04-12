@@ -11,7 +11,7 @@ export const getProducts = async (req, res) => {
             search: search || "",
             category: category || "",
             page: parseInt(page) || 1,
-            limit: parseInt(limit) || 10
+            limit: parseInt(limit) || 5
         });
         //
         res.status(200).json(data);
