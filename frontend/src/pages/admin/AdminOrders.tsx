@@ -1,5 +1,10 @@
 //lib
+import { useState } from 'react';
 import { Trash2, ClipboardList, User2, MapPin, Calendar, Hash } from 'lucide-react';
+
+//components
+import { TableRowSkeleton } from '../../component/Skeleton';
+import Pagination from '../../component/Pagination';
 
 //zustands
 import { useToastStore } from "../../store/useToastStore";
@@ -10,7 +15,6 @@ import { useOrderMutations } from "../../hooks/order/useOrderMutation";
 
 //types
 import type { Order } from "../../types/order";
-import { TableRowSkeleton } from '../../component/Skeleton';
 const STATUS_LABEL: Record<string, string> = {
     pending: "Chờ xác nhận", confirmed: "Đã xác nhận", shipping: "Đang giao", done: "Đã giao", canceled: "Đã hủy",
 };
@@ -25,8 +29,10 @@ const STATUS_COLOR: Record<string, string> = {
 
 export default function AdminOrders() {
     const showToast = useToastStore((state) => state.show);
+    const [currentPage, setCurrentPage] = useState(1);
 
-    const { orders, isLoading } = useOrderList();
+
+    const { orders, pagination, isLoading } = useOrderList(currentPage);
     const {
         updateOrder,
         deleteOrder,
@@ -34,12 +40,19 @@ export default function AdminOrders() {
         isDeleting
     } = useOrderMutations();
 
+
+
+    // Khi đổi trang — scroll lên đầu
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
             {/* Header  */}
             <div className="mb-8">
                 <h1 className="text-2xl font-black text-gray-800 tracking-tight">Quản Lý Đơn Hàng</h1>
-                <p className="text-sm text-gray-500 font-medium">Theo dõi doanh thu và tiến độ xử lý đơn hàng Seefood</p>
+                <p className="text-sm text-gray-500 font-medium">Theo dõi doanh thu và tiến độ xử lý đơn hàng Seafood</p>
             </div>
 
             {isLoading ? (
@@ -130,6 +143,13 @@ export default function AdminOrders() {
                                 ))}
                             </tbody>
                         </table>
+                        {pagination && (
+                            <Pagination
+                                currentPage={pagination.currentPage}
+                                totalPages={pagination.totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        )}
                     </div>
                 </div>
             )}

@@ -1,5 +1,10 @@
 //lib
 import { Trash2, SquarePen, UserCircle, Plus, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+
+//components
+import Pagination from '../../component/Pagination';
+import { TableRowSkeleton } from '../../component/Skeleton';
 
 //zustands
 import { useToastStore } from "../../store/useToastStore";
@@ -10,14 +15,21 @@ import { useUserMutations } from "../../hooks/user/useUserMutation";
 
 //types
 import type { User } from '../../types/user';
-import { TableRowSkeleton } from '../../component/Skeleton';
 
 
 export default function AdminUsers() {
     const showToast = useToastStore((state) => state.show);
+    const [currentPage, setCurrentPage] = useState(1);
 
     //custom hooks
-    const { users, isLoading } = useUserList();
+    const { users, pagination, isLoading } = useUserList(currentPage);
+
+
+    // Khi đổi trang — scroll lên đầu
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
     const {
         deleteUser,
@@ -118,6 +130,13 @@ export default function AdminUsers() {
                                 ))}
                             </tbody>
                         </table>
+                        {pagination && (
+                            <Pagination
+                                currentPage={pagination.currentPage}
+                                totalPages={pagination.totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        )}
                     </div>
                 </div>
             )}

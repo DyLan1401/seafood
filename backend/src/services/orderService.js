@@ -1,11 +1,37 @@
 import pool from "../utils/db.js";
 
+let ordersCache = {};
 //lấy đơn hàng
-export const getOrders = async () => {
-    const [rows] = await pool.query(
-        ` SELECT id,customer_name,phone,address,note,total,status,created_at FROM orders ORDER BY id DESC`
+export const getOrders = async ({ page = 1, limit = 5 }) => {
+    const cacheKey = `order_p${page}_l${limit}`;
+
+    const offset = (page - 1) * limit;
+
+    const dataSql = await pool.query(
+        `SELECT id,customer_name,phone,address,note,total,status,created_at 
+        FROM orders
+         ORDER BY id DESC
+        LIMIT ? OFFSET ?
+`
     );
-    return rows;
+
+    const [rows] = await pool.query(dataSql, [limit, offset]);
+
+    // 
+    const result = {
+        items: rows,
+        pagination: {
+            totalItems: total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            limit: limit
+        }
+    };
+
+    ordersCache[cacheKey] = result;
+
+
+    return result;
 };
 
 //thêm mới đơn hàng

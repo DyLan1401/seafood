@@ -6,9 +6,14 @@ import jwt from "jsonwebtoken";
 export const userList = async (req, res) => {
     try {
 
-        const data = await authService.userList();
+        const { page, limit } = req.query;
 
-        if (!data.affectedRows === 0) {
+        const data = await authService.userList({
+            page: parseInt(page) || 1,
+            limit: parseInt(limit) || 10
+        });
+
+        if (data.affectedRows === 0) {
             return res.status(401).json({ error: "user đang trống" });
         }
 

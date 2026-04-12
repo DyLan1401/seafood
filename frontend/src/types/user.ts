@@ -2,5 +2,7 @@ export interface User {
     id: string,
     email: string,
     password: string | null;
-    role: string
+    role: string;
+    customerName?: string | undefined;
+
 }

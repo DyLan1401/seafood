@@ -2,8 +2,8 @@ import api from "../api/axios"
 import type { Category } from "../types/category";
 
 //danh sách danh mục
-export const fetchCategoryList = async () => {
-    const res = await api.get(`/category/all`)
+export const fetchCategoryList = async (page: number = 1) => {
+    const res = await api.get(`/category/all?page=${page}`)
     return res.data;
 };
 

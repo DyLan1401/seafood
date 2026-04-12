@@ -11,17 +11,26 @@ import { useCategoryList } from "../hooks/category/useCategoryList";
 
 //types
 import type { Category } from "../types/category";
+import Pagination from "../component/Pagination";
+import { useState } from "react";
 
 
 export default function Categories() {
 
+    const [currentPage, setCurrentPage] = useState(1);
+
     // gọi biến từ hook
-    const { categories, isLoading: isLoadingCategories, isError: isErrorCategories } = useCategoryList();
+    const { categories, pagination, isLoading: isLoadingCategories, isError: isErrorCategories } = useCategoryList(currentPage);
     //
 
     //kiểm tra data
     const categoryList = categories?.items || [];
 
+    // Khi đổi trang — scroll lên đầu
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
     //loading
     if (isLoadingCategories) return (
         <div className="flex justify-center items-center h-screen animate-pulse font-semibold text-gray-500">
@@ -43,6 +52,12 @@ export default function Categories() {
             <main className="container mx-auto p-2 md:p-5">
                 <div className="text-lg md:text-xl rounded-t-lg bg-[#BF4E2C] p-3 font-semibold text-white text-start">
                     Tất cả danh mục
+                    {/* Hiển thị tổng số sản phẩm */}
+                    {pagination && (
+                        <span className="text-sm font-normal ml-2 opacity-80">
+                            ({pagination.totalItems} danh mục)
+                        </span>
+                    )}
                 </div>
 
                 {/* danh sách danh mục  */}
@@ -63,6 +78,16 @@ export default function Categories() {
                         </Link>
                     ))}
                 </div>
+
+                {/* Pagination */}
+                {pagination && (
+                    <Pagination
+                        currentPage={pagination.currentPage}
+                        totalPages={pagination.totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                )}
+
             </main>
             <Footer />
         </>

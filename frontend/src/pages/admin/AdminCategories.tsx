@@ -5,6 +5,7 @@ import { Trash2, SquarePen, ImageIcon, Plus } from 'lucide-react';
 //components
 import CategoryModal from "../../component/CategoryModal";
 import { TableRowSkeleton } from "../../component/Skeleton";
+import Pagination from '../../component/Pagination';
 
 //zustands
 import { useToastStore } from "../../store/useToastStore";
@@ -23,11 +24,18 @@ export default function AdminCategories() {
     // States 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
-    const { categories, isLoading, } = useCategoryList();
+    const { categories, pagination, isLoading, } = useCategoryList(currentPage);
     const { deleteCategory, isDeleting, isUpdating } = useCategoryMutations();
 
     const categoryList = categories?.items || [];
+
+    // Khi đổi trang — scroll lên đầu
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
     const handleEdit = (category: Category) => {
         setSelectedCategory(category);
@@ -45,7 +53,7 @@ export default function AdminCategories() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-black text-gray-800 tracking-tight">Quản Lý Danh Mục</h1>
-                    <p className="text-sm text-gray-500 font-medium">Quản lý các loại sản phẩm Seefood</p>
+                    <p className="text-sm text-gray-500 font-medium">Quản lý danh sách   các loại sản phẩm Seafood</p>
                 </div>
                 <button
                     onClick={handleAddNew}
@@ -129,6 +137,13 @@ export default function AdminCategories() {
                             ))}
                         </tbody>
                     </table>
+                    {pagination && (
+                        <Pagination
+                            currentPage={pagination.currentPage}
+                            totalPages={pagination.totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    )}
                 </div>
             )}
 

@@ -30,6 +30,8 @@ export default function Header() {
         }
     };
 
+    const userRole = user?.role;
+
     //hiển thị count trong giỏ hàng
     const items = useCartStore((state) => state.items);
     const displayCount = items.reduce((total, item) => total + item.qty, 0);
@@ -93,13 +95,24 @@ export default function Header() {
                                     <div className="fixed inset-0 z-10" onClick={() => setActiveMenu("")}></div>
                                     <div className="absolute top-10 right-0 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-2">
                                         {isAuth ? (
-                                            <>
-                                                <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100 italic">
-                                                    {user?.email}
-                                                </div>
-                                                <Link to="/my-order" className="block px-4 py-2 text-sm hover:bg-red-50 transition" onClick={() => setActiveMenu("")}>Đơn hàng của tôi</Link>
-                                                <button onClick={() => { logout(); setActiveMenu(""); }} className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Đăng xuất</button>
-                                            </>
+                                            userRole === "admin" ? (
+                                                <>
+                                                    <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100 italic">
+                                                        {user?.email}
+                                                    </div>
+                                                    <Link to="/admin" className="block px-4 py-2 text-sm hover:bg-red-50 transition" onClick={() => setActiveMenu("")}>Dashboard</Link>
+                                                    <Link to="/my-order" className="block px-4 py-2 text-sm hover:bg-red-50 transition" onClick={() => setActiveMenu("")}>Đơn hàng của tôi</Link>
+                                                    <button onClick={() => { logout(); setActiveMenu(""); }} className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Đăng xuất</button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100 italic">
+                                                        {user?.email}
+                                                    </div>
+                                                    <Link to="/my-order" className="block px-4 py-2 text-sm hover:bg-red-50 transition" onClick={() => setActiveMenu("")}>Đơn hàng của tôi</Link>
+                                                    <button onClick={() => { logout(); setActiveMenu(""); }} className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Đăng xuất</button>
+                                                </>
+                                            )
                                         ) : (
                                             <>
                                                 <Link to="/login" onClick={() => setActiveMenu("")} className="block px-4 py-2 text-sm text-gray-700 hover:bg-sky-50 transition">Đăng nhập</Link>
@@ -156,6 +169,6 @@ export default function Header() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

@@ -37,7 +37,7 @@ export default function Checkout() {
         useForm<CheckoutFormData>({
             resolver: zodResolver(checkoutSchema),  // thêm dòng này
             defaultValues: {
-                customerName: user?.email || "",
+                customerName: user?.customerName || "",
                 phone: "",
                 address: "",
                 note: "",

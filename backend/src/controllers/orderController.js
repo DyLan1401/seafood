@@ -4,7 +4,14 @@ import * as orderService from '../services/orderService.js';
 export const getAllOrders = async (req, res) => {
     try {
         //
-        const data = await orderService.getOrders();
+
+        const { page, limit } = req.query;
+
+        const data = await orderService.getOrders({
+            page: parseInt(page) || 1,
+            limit: parseInt(limit) || 10
+        });
+
         //check 
         if (!data) {
             return res.status(404).json({ message: "Không tìm thấy đơn hàng!!!" });

@@ -2,8 +2,8 @@ import type { CreateOrderPayload } from "../types/order";
 import api from "./axios";
 
 //danhh sách đơn hàng
-export const fetchOrderList = async () => {
-    const res = await api.get(`/order/all`);
+export const fetchOrderList = async (page: number = 1) => {
+    const res = await api.get(`/order/all?page${page}`);
     return res.data;
 };
 

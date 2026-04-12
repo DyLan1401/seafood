@@ -1,5 +1,5 @@
 **Project**
---Seefood Project
+--Seafood Project
 
 **Technology**
 Frontend: React.js + TypeScript + Tailwind CSS + React Query + Zustand
@@ -45,4 +45,4 @@ PATCH https://seafood-vyx2.onrender.com/api/orders/:id/status cập nhật đơn
 
 
 **Admin test account**
-liên hệ để cấp tải khoản admin để test
+liên hệ để cấp tài khoản admin để test

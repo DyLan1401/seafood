@@ -1,7 +1,7 @@
 //lib
 import { Link, useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 //components
 import Footer from "../component/Footer";
@@ -14,27 +14,34 @@ import { useProductList } from "../hooks/product/useProductList";
 
 //types
 import type { Product } from "../types/product";
+import Pagination from "../component/Pagination";
 
 
 export default function Products() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const searchQuery = (searchParams.get("search") || "").toLowerCase();
-    const { products, isLoading, isError } = useProductList();
+    const [currentPage, setCurrentPage] = useState(1);
 
+    const { products, pagination, isLoading, isError } = useProductList(currentPage);
 
-    const productList = products?.items || [];
+    // Khi đổi trang — scroll lên đầu
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
     // const productList = useMemo(() => {
     //     return products?.items || [];
     // }, [products]);
 
     //tìm kiếm
     const filteredProducts = useMemo(() => {
-        return productList.filter((p: Product) =>
+        return products.filter((p: Product) =>
             p.name?.toLowerCase().includes(searchQuery)
         );
 
-    }, [productList, searchQuery])
+    }, [products, searchQuery])
 
 
     if (isError) return (
@@ -51,6 +58,12 @@ export default function Products() {
             <main className="container mx-auto py-4 md:py-6">
                 <div className="text-lg md:text-xl rounded-t-lg bg-[#BF4E2C] p-3 md:p-4 font-semibold text-white text-start uppercase">
                     {searchQuery ? `Kết quả tìm kiếm: "${searchQuery}"` : "Tất cả sản phẩm"}
+                    {/* Hiển thị tổng số sản phẩm */}
+                    {pagination && (
+                        <span className="text-sm font-normal ml-2 opacity-80">
+                            ({pagination.totalItems} sản phẩm)
+                        </span>
+                    )}
                 </div>
 
                 {/* hiển thị sản phẩm */}
@@ -86,7 +99,17 @@ export default function Products() {
                             </button>
                         </div>
                     )}
+
                 </div>
+                {/* Pagination */}
+                {pagination && (
+                    <Pagination
+                        currentPage={pagination.currentPage}
+                        totalPages={pagination.totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                )}
+
             </main>
             <Footer />
         </>

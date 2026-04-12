@@ -1,16 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import * as api from "../../api/orderApi";
 
-export const useOrderList = () => {
+export const useOrderList = (page: number = 1) => {
     const queryList = useQuery({
         queryKey: ["orders"],
-        queryFn: api.fetchOrderList,
+        queryFn: () => api.fetchOrderList(page),
         select: (data) => data?.items || data || [],
         staleTime: 5 * 60 * 1000,
     });
 
     return {
         orders: queryList.data,
+        pagination: queryList.data?.pagination,
         isLoading: queryList.isLoading,
         isError: queryList.isError,
     };

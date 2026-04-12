@@ -1,11 +1,44 @@
 import pool from "../utils/db.js";
 
+let usersCache = {};
+
 //danh sách người dùng
-export const userList = async () => {
-    const [rows] = await pool.query(
-        `SELECT *  from users ORDER BY id DESC`
-    )
-    return rows;
+export const userList = async ({ page = 1, limit = 5 }) => {
+    const cacheKey = `users_p${page}_l${limit}`;
+
+
+    // kiểm tra đã có data trong cache chưa
+    if (usersCache[cacheKey]) {
+        return usersCache[cacheKey];
+    }
+
+    const offset = (page - 1) * limit;
+
+    const dataSql = await pool.query(
+        `SELECT *  
+        from users
+         ORDER BY id DESC
+          LIMIT ? OFFSET ?
+`
+    );
+
+    const [rows] = await pool.query(dataSql, [limit, offset]);
+
+    // 
+    const result = {
+        items: rows,
+        pagination: {
+            totalItems: total,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            limit: limit
+        }
+    };
+
+    usersCache[cacheKey] = result;
+
+
+    return result;
 };
 
 //chi tiết người dùng

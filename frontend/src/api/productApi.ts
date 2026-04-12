@@ -2,8 +2,8 @@ import api from "../api/axios"
 import type { Product } from "../types/product";
 
 //danh sách sản phẩm
-export const fetchProductList = async () => {
-    const res = await api.get(`/product/all`)
+export const fetchProductList = async (page: number = 1) => {
+    const res = await api.get(`/product/all?page=${page}`);
     return res.data;
 };
 

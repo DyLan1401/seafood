@@ -156,7 +156,7 @@ export default function ProductModal({ isOpen, onClose, initialData }: ProductFo
                             <h2 className="text-xl font-extrabold text-gray-800">
                                 {isEdit ? "Chỉnh sửa thông tin" : "Thêm hải sản mới"}
                             </h2>
-                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Hệ thống quản lý Seefood</p>
+                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Hệ thống quản lý Seafood</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="hover:bg-gray-200 p-2 rounded-full transition-all group">

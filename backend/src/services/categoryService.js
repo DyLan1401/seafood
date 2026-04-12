@@ -3,7 +3,7 @@ import pool from "../utils/db.js";
 let categoriesCache = {};
 
 //lấy danh mục
-export const getCategory = async ({ page = 1, limit = 10 }) => {
+export const getCategory = async ({ page = 1, limit = 5 }) => {
   const cacheKey = `categories_p${page}_l${limit}`;
 
   // kiểm tra đã có data trong cache chưa

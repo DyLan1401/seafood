@@ -61,7 +61,7 @@ export default function DashboardOverview() {
         <div className="p-6 bg-gray-50 min-h-screen">
             <div className="mb-8">
                 <h1 className="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-                    <TrendingUp className="text-blue-600" /> Hệ thống Seefood Overview
+                    <TrendingUp className="text-blue-600" /> Hệ thống Seafood Overview
                 </h1>
                 <p className="text-sm text-gray-500 font-medium">Báo cáo tình hình kinh doanh tổng thể</p>
             </div>

@@ -28,6 +28,7 @@ export default function Home() {
     const { products, isLoading: isLoadingProducts, isError: isErrorProducts } = useProductList();
     const { categories, isLoading: isLoadingCategories, isError: isErrorCategories } = useCategoryList();
 
+
     //báo error 
     if (isErrorProducts || isErrorCategories) return <div className="text-center py-10">Lỗi tải Dữ liệu</div>
 
@@ -48,8 +49,8 @@ export default function Home() {
                             Array.from({ length: 8 }).map((_, i) => (
                                 <ProductCardSkeleton key={i} />
                             ))
-                        ) : products?.items && products.items.length > 0 ? (
-                            products.items.map((p: Product) => (
+                        ) : products.length > 0 ? (
+                            products.map((p: Product) => (
                                 <Link
                                     key={p.id}
                                     to={`/product/${p.id}`}

@@ -10,6 +10,11 @@ export const getAllCategory = async (req, res) => {
             page: parseInt(page) || 1,
             limit: parseInt(limit) || 10
         });
+
+        if (data.affectedRows === 0) {
+            return res.status(401).json({ error: "danh mục đang trống" });
+
+        }
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({

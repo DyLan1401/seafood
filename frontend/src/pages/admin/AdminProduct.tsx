@@ -19,14 +19,16 @@ import { TableRowSkeleton } from "../../component/Skeleton";
 //types
 import type { Product } from "../../types/product";
 import type { Category } from '../../types/category';
+import Pagination from '../../component/Pagination';
 
 export default function AdminProducts() {
     const showToast = useToastStore((state) => state.show);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
-    const { products, isLoading: isLoadingProducts } = useProductList();
+    const { products, pagination, isLoading: isLoadingProducts } = useProductList(currentPage);
     const { deleteProduct, isDeleting } = useProductMutations();
 
     // thêm danh mục
@@ -37,7 +39,11 @@ export default function AdminProducts() {
         categories?.items?.map((c: Category) => [c.id, c.name]) ?? []
     );
 
-    const productList = products?.items || [];
+    // Khi đổi trang — scroll lên đầu
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
     const handleAddClick = () => {
         setSelectedProduct(null);
@@ -58,7 +64,7 @@ export default function AdminProducts() {
                         Quản Lý Sản Phẩm
                     </h1>
                     <p className="text-sm text-gray-500 font-medium">
-                        Danh sách các mặt hàng hải sản trên hệ thống
+                        Danh sách có các mặt hàng hải sản trên hệ thống
                     </p>
                 </div>
                 <button
@@ -82,7 +88,7 @@ export default function AdminProducts() {
                         </table>
                     </div>
                 </div>
-            ) : productList.length === 0 ? (
+            ) : products.length === 0 ? (
                 <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
                     <PackageOpen size={48} className="mx-auto text-gray-200 mb-4" />
                     <p className="text-gray-400 font-medium">
@@ -113,7 +119,7 @@ export default function AdminProducts() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
-                                {productList.map((p: Product) => (
+                                {products.map((p: Product) => (
                                     <tr
                                         key={p.id}
                                         className="hover:bg-blue-50/30 transition-colors group"
@@ -209,6 +215,14 @@ export default function AdminProducts() {
                                 ))}
                             </tbody>
                         </table>
+                        {/* Pagination */}
+                        {pagination && (
+                            <Pagination
+                                currentPage={pagination.currentPage}
+                                totalPages={pagination.totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        )}
                     </div>
                 </div>
             )}
