@@ -8,6 +8,9 @@ export const clearOrdersCache = () => {
 //lấy đơn hàng
 export const getOrders = async ({ page = 1, limit = 5 }) => {
     const cacheKey = `order_p${page}_l${limit}`;
+    if (ordersCache[cacheKey]) {
+        return ordersCache[cacheKey];
+    }
 
     const offset = (page - 1) * limit;
     const countSql = `SELECT COUNT(*) as total FROM orders`;
@@ -50,7 +53,7 @@ export const addOrder = async ({ userId, customerName, phone, address, note = ""
         if (!items || items.length === 0) throw new Error("Giỏ hàng rỗng");
         //
         const productIds = items.map((x) => x.productId);
-        const [products] = await pool.query(
+        const [products] = await conn.query(
             `SELECT id, name, price, sale_price FROM products WHERE id IN (${productIds.map(() => "?").join(",")})`,
             productIds
         );
@@ -100,7 +103,7 @@ export const addOrder = async ({ userId, customerName, phone, address, note = ""
 //lấy chi tiết đơn hàng
 export const getOrderDetail = async ({ id }) => {
     const [orders] = await pool.query(
-        "SELECT id,customer_name,phone,address,note,total,status,created_at FROM orders WHERE id = ? LIMIT 1", [id]
+        "SELECT id,user_id,customer_name,phone,address,note,total,status,created_at FROM orders WHERE id = ? LIMIT 1", [id]
     );
     //
     if (orders.length === 0) {
@@ -142,7 +145,7 @@ export const updateOrder = async ({ id, status }) => {
 //lịch sử đơn hàng
 export const getOrdersByUserId = async ({ userId }) => {
     const [rows] = await pool.query(
-        'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
+        'SELECT id, user_id, customer_name, phone, address, note, total, status, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC',
         [userId]
     );
     return rows;

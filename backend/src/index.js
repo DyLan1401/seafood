@@ -13,8 +13,16 @@ import authRoute from "./routes/authRoute.js"
 
 //cho phép url truy cập
 const app = express();
+app.disable("x-powered-by");
+app.use((req, res, next) => {
+    // Basic security headers without adding a new dependency.
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Referrer-Policy", "no-referrer");
+    next();
+});
 app.use(cors({
-    origin: [
+    origin: process.env.CORS_ORIGINS?.split(",").map((origin) => origin.trim()).filter(Boolean) || [
         'https://seafood-liard.vercel.app',
         'https://seafood-git-main-nlan4670-1022s-projects.vercel.app',
         'http://localhost:5173'

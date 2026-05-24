@@ -6,12 +6,8 @@ export const clearUsersCache = () => {
     usersCache = {};
 };
 
-//danh sách người dùng
 export const userList = async ({ page = 1, limit = 5 }) => {
     const cacheKey = `users_p${page}_l${limit}`;
-
-
-    // kiểm tra đã có data trong cache chưa
     if (usersCache[cacheKey]) {
         return usersCache[cacheKey];
     }
@@ -20,81 +16,89 @@ export const userList = async ({ page = 1, limit = 5 }) => {
     const countSql = `SELECT COUNT(*) as total FROM users`;
     const [[{ total }]] = await pool.query(countSql);
 
-    const dataSql =
-        `SELECT *  
-        from users
-         ORDER BY id DESC
-          LIMIT ? OFFSET ?
-`;
-
+    // Never expose password hashes from list APIs.
+    const dataSql = `
+        SELECT id, email, role, created_at
+        FROM users
+        ORDER BY id DESC
+        LIMIT ? OFFSET ?
+    `;
 
     const [rows] = await pool.query(dataSql, [limit, offset]);
 
-    // 
     const result = {
         items: rows,
         pagination: {
             totalItems: total,
             totalPages: Math.ceil(total / limit),
             currentPage: page,
-            limit: limit
+            limit
         }
     };
 
     usersCache[cacheKey] = result;
-
-
     return result;
 };
 
-//chi tiết người dùng
 export const userDetail = async ({ id }) => {
     const [rows] = await pool.query(
-        `SELECT *  from users where id = ?`
-        , [id]
-    )
+        `SELECT id, email, role, created_at FROM users WHERE id = ? LIMIT 1`,
+        [id]
+    );
     return rows[0];
 };
 
-//xóa người dùng
 export const deleteUser = async ({ id }) => {
     const [rows] = await pool.query(
-        `DELETE from users where id = ?`
-        , [id]
+        `DELETE FROM users WHERE id = ?`,
+        [id]
     );
     clearUsersCache();
     return rows;
 };
 
-//cập nhật người dùng
 export const updateUser = async ({ id, email, password, role }) => {
+    const fields = [];
+    const values = [];
+
+    if (email !== undefined) {
+        fields.push("email = ?");
+        values.push(email);
+    }
+    if (password !== undefined) {
+        fields.push("password = ?");
+        values.push(password);
+    }
+    if (role !== undefined) {
+        fields.push("role = ?");
+        values.push(role);
+    }
+
+    if (fields.length === 0) {
+        return { affectedRows: 0 };
+    }
+
+    values.push(id);
     const [rows] = await pool.query(
-        `UPDATE users SET 
-        email = ?,
-        password = ?,
-        role = ?,
-        WHERE id = ?
-        `
-        , [email, password, role, id]
+        `UPDATE users SET ${fields.join(", ")} WHERE id = ?`,
+        values
     );
     clearUsersCache();
     return rows;
 };
 
-//tìm email trong bẳng users
 export const findUserByEmail = async (email) => {
     const [rows] = await pool.query(
-        `SELECT id, email, password ,role FROM users WHERE email = ? LIMIT 1`,
+        `SELECT id, email, password, role FROM users WHERE email = ? LIMIT 1`,
         [email]
     );
 
     return rows[0];
 };
 
-//thêm mới email//password vào bảng users
 export const register = async ({ email, password }) => {
     const [result] = await pool.query(
-        `INSERT INTO users (email, password) VALUES (?, ?)`,
+        `INSERT INTO users (email, password, role) VALUES (?, ?, 'user')`,
         [email, password]
     );
     clearUsersCache();

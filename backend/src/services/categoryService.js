@@ -50,7 +50,7 @@ export const getCategory = async ({ page = 1, limit = 5 }) => {
 //chi tiết danh mục
 export const getCategoryDetail = async ({ slug }) => {
   const [rows] = await pool.query(
-    `SELECT id, name, slug, image_url, created_at FROM categories`
+    `SELECT id, name, slug, image_url, created_at FROM categories WHERE slug = ? LIMIT 1`
     , [slug]
   );
   return rows[0];

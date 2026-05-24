@@ -1,5 +1,5 @@
 //lib
-import { useState, useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import { useForm } from "react-hook-form";
 import { X, Save, ImageIcon, Loader2, Tag, Upload } from "lucide-react";
 
@@ -14,13 +14,35 @@ import type { Category, CategoryModalProps } from "../types/category";
 
 
 
+type ImageDraftState = {
+    selectedFile: File | null;
+    previewUrl: string;
+};
+
+type ImageDraftAction =
+    | { type: "reset"; previewUrl: string }
+    | { type: "select"; file: File; previewUrl: string };
+
+function imageDraftReducer(
+    _state: ImageDraftState,
+    action: ImageDraftAction
+): ImageDraftState {
+    if (action.type === "reset") {
+        return { selectedFile: null, previewUrl: action.previewUrl };
+    }
+
+    return { selectedFile: action.file, previewUrl: action.previewUrl };
+}
+
 export default function CategoryModal({ isOpen, onClose, initialData }: CategoryModalProps) {
     const showToast = useToastStore((state) => state.show);
     const isEdit = !!initialData;
 
     //state
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [previewUrl, setPreviewUrl] = useState<string>("");
+    const [{ selectedFile, previewUrl }, dispatchImageDraft] = useReducer(
+        imageDraftReducer,
+        { selectedFile: null, previewUrl: "" }
+    );
 
 
 
@@ -43,17 +65,22 @@ export default function CategoryModal({ isOpen, onClose, initialData }: Category
     //
     useEffect(() => {
         if (isOpen) {
-            setPreviewUrl(initialData?.image_url || "");
-            setSelectedFile(null);
+            dispatchImageDraft({
+                type: "reset",
+                previewUrl: initialData?.image_url || "",
+            });
         }
-    }, [isOpen, initialData]);
+    }, [isOpen, initialData?.image_url]);
 
     //
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setSelectedFile(file);
-            setPreviewUrl(URL.createObjectURL(file));
+            dispatchImageDraft({
+                type: "select",
+                file,
+                previewUrl: URL.createObjectURL(file),
+            });
         }
     };
 

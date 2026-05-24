@@ -1,5 +1,5 @@
 //lib
-import { useState, useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import { useForm } from "react-hook-form";
 import {
     X, Save,
@@ -20,6 +20,27 @@ import type { Category } from "../types/category";
 
 
 
+type ImageDraftState = {
+    selectedFile: File | null;
+    previewUrl: string;
+};
+
+type ImageDraftAction =
+    | { type: "reset"; previewUrl: string }
+    | { type: "select"; file: File; previewUrl: string };
+
+function imageDraftReducer(
+    _state: ImageDraftState,
+    action: ImageDraftAction
+): ImageDraftState {
+    if (action.type === "reset") {
+        return { selectedFile: null, previewUrl: action.previewUrl };
+    }
+
+    return { selectedFile: action.file, previewUrl: action.previewUrl };
+}
+
+
 
 export default function ProductModal({ isOpen, onClose, initialData }: ProductFormProps) {
     const showToast = useToastStore((state) => state.show);
@@ -29,8 +50,10 @@ export default function ProductModal({ isOpen, onClose, initialData }: ProductFo
 
     const categoryList = categories?.items || [];
 
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [previewUrl, setPreviewUrl] = useState<string>("");
+    const [{ selectedFile, previewUrl }, dispatchImageDraft] = useReducer(
+        imageDraftReducer,
+        { selectedFile: null, previewUrl: "" }
+    );
     const {
         createProduct,
         updateProduct,
@@ -66,20 +89,11 @@ export default function ProductModal({ isOpen, onClose, initialData }: ProductFo
     useEffect(() => {
         if (!isOpen) return;
 
-        if (isEdit && initialData?.image_url) {
-            setPreviewUrl(initialData.image_url);
-        } else {
-            setPreviewUrl("");
-            setSelectedFile(null);
-        }
-
-        // Cleanup function để giải phóng bộ nhớ khi component unmount hoặc deps thay đổi
-        return () => {
-            if (previewUrl && previewUrl.startsWith("blob:")) {
-                URL.revokeObjectURL(previewUrl);
-            }
-        };
-    }, [isOpen, isEdit, initialData?.id]);
+        dispatchImageDraft({
+            type: "reset",
+            previewUrl: isEdit ? initialData?.image_url || "" : "",
+        });
+    }, [isOpen, isEdit, initialData?.image_url]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -92,8 +106,11 @@ export default function ProductModal({ isOpen, onClose, initialData }: ProductFo
                 showToast("Ảnh quá nặng (tối đa 5MB)!", "error");
                 return;
             }
-            setSelectedFile(file);
-            setPreviewUrl(URL.createObjectURL(file));
+            dispatchImageDraft({
+                type: "select",
+                file,
+                previewUrl: URL.createObjectURL(file),
+            });
         }
     };
 

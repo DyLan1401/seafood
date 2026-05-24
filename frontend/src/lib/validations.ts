@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Schema đăng nhập
 export const loginSchema = z.object({
     email: z
         .string()
@@ -13,14 +12,8 @@ export const loginSchema = z.object({
         .max(50, "Mật khẩu tối đa 50 ký tự"),
 });
 
-// Schema đăng ký
 export const registerSchema = z
     .object({
-        username: z
-            .string()
-            .min(2, "Tên tối thiểu 2 ký tự")
-            .max(30, "Tên tối đa 30 ký tự"),
-
         email: z
             .string()
             .min(1, "Email không được để trống")
@@ -38,7 +31,6 @@ export const registerSchema = z
         path: ["confirmPassword"],
     });
 
-// Schema checkout
 export const checkoutSchema = z.object({
     customerName: z
         .string()
@@ -49,7 +41,7 @@ export const checkoutSchema = z.object({
         .string()
         .regex(
             /^(0[3|5|7|8|9])[0-9]{8}$/,
-            "Số điện thoại không đúng định dạng (VD: 0912345678)"
+            "Số điện thoại không đúng định dạng, ví dụ: 0912345678"
         ),
 
     address: z
@@ -60,7 +52,6 @@ export const checkoutSchema = z.object({
     note: z.string().max(300, "Ghi chú tối đa 300 ký tự").optional(),
 });
 
-// Export types
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
 export type CheckoutFormData = z.infer<typeof checkoutSchema>;

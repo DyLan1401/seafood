@@ -30,7 +30,8 @@ export default function Register() {
             resolver: zodResolver(registerSchema),
             defaultValues: {
                 email: "",
-                password: ""
+                password: "",
+                confirmPassword: "",
             }
         });
 
@@ -90,6 +91,17 @@ export default function Register() {
                             />
                             {errors.password && <span className="error text-red-500">{errors.password.message as string}</span>}
 
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu</label>
+                            <input
+                                type="password"
+                                placeholder="Nhập lại mật khẩu"
+                                className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-[#2C8DE0] focus:border-transparent transition-all"
+                                {...register("confirmPassword")}
+                            />
+                            {errors.confirmPassword && <span className="error text-red-500">{errors.confirmPassword.message as string}</span>}
                         </div>
 
                         <button

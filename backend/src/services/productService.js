@@ -36,7 +36,7 @@ export const getAllProducts = async ({ page = 1, limit = 10, search = "", catego
   // 2. Câu lệnh lấy dữ liệu có phân trang
   let dataSql = `
       SELECT p.id, p.name, p.slug, p.price, p.sale_price, p.stock,
-             p.image_url, p.description, p.origin, p.weight,
+             p.image_url, p.description, p.origin, p.weight, p.category_id,
              c.name as category_name, c.slug as category_slug
       FROM products p
       JOIN categories c ON p.category_id = c.id
@@ -115,8 +115,7 @@ export const updateProduct = async ({ id, name, slug, price, sale_price, stock, 
     description = ?,
     origin = ?,
     weight = ?,
-    category_id = ?,
-    created_at = NOW()
+    category_id = ?
     WHERE id = ?
     `
     , [name, slug, price, sale_price, stock, image_url, description, origin, weight, category_id, id]

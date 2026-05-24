@@ -29,3 +29,12 @@ export const verifyToken = (req, res, next) => {
         res.status(401).json({ error: "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!" });
     }
 };
+
+export const requireAdmin = (req, res, next) => {
+    // Admin-only guard for management APIs. Authentication alone is not enough.
+    if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Bạn không có quyền thực hiện thao tác này" });
+    }
+
+    next();
+};

@@ -2,12 +2,13 @@ DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS categories;
-DROP TABLE IF EXISTS admins;
+DROP TABLE IF EXISTS users;
 
-CREATE TABLE admins (
+CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('user','admin') NOT NULL DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -39,13 +40,17 @@ CREATE TABLE products (
 
 CREATE TABLE orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
   customer_name VARCHAR(120) NOT NULL,
   phone VARCHAR(30) NOT NULL,
   address VARCHAR(255) NOT NULL,
   note VARCHAR(255),
   total INT NOT NULL,
   status ENUM('pending','confirmed','shipping','done','canceled') NOT NULL DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_orders_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE order_items (

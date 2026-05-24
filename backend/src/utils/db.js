@@ -7,7 +7,7 @@ import mysql from "mysql2/promise";
 //
 const isSSL = process.env.DB_SSL === "true";
 
-//  
+// SSL is enabled only for managed databases that require it.
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
@@ -20,9 +20,7 @@ const pool = mysql.createPool({
     acquireTimeout: 30000,
     timeout: 30000,
     queueLimit: 0,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    ssl: isSSL ? { rejectUnauthorized: false } : undefined
 });
 
 export default pool;
